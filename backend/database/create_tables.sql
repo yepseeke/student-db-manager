@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS qualification_work;
-DROP TABLE IF EXISTS studies_in;
 DROP TABLE IF EXISTS student;
 DROP TABLE IF EXISTS professor CASCADE;
 DROP TABLE IF EXISTS department;
@@ -26,7 +25,7 @@ CREATE TYPE workstatus AS ENUM ('in progress', 'complete');
 
 CREATE TABLE IF NOT EXISTS faculty (
 	faculty_id serial PRIMARY KEY,
-	"name" character varying(20) NOT NULL
+	"name" character varying(40) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS course (
@@ -54,19 +53,13 @@ ALTER TABLE department
 ADD COLUMN department_head_id integer UNIQUE REFERENCES professor(professor_id);
 
 CREATE TABLE IF NOT EXISTS student (
-    student_card_id integer PRIMARY KEY,
+    student_card_id serial PRIMARY KEY,
 	department_id integer REFERENCES department(department_id),
+	course_id integer REFERENCES course(course_id),
     surname character varying(50) NOT NULL,
     "name" character varying(50) NOT NULL,
-    patronymic character varying(50) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS studies_in (
-	id serial PRIMARY KEY,
-	student_card_id integer NOT NULL REFERENCES student(student_card_id),
-	course_id smallserial NOT NULL REFERENCES course(course_id),
-	admission_year integer NOT NULL,
-	education_status educationstatus NOT NULL
+    patronymic character varying(50) NOT NULL,
+	"year" integer NOT NULL
 );
 
 CREATE TABLE qualification_work (
