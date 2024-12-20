@@ -1,39 +1,31 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
 	"log"
-	"net/http"
 
-	"github.com/rs/cors"
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
+var db *sql.DB
+
 func main() {
-	db, err := ConnectDB()
+	var err error
+	db, err = sql.Open("postgres", "user=postgres password=6902 dbname=student_registry sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	http.HandleFunc("/students", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		students, err := GetStudents(db)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	r := gin.Default()
 
-		jsonData, err := json.Marshal(students)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	r.GET("/students", getStudents) // Получить список студентов
+	// r.POST("/students", addStudent)            // Добавить студента
+	// r.GET("/students/:id", getStudentDetails)  // Получить детали студента
+	// r.PUT("/students/:id", updateStudent)      // Полностью обновить студента
+	// r.PATCH("/students/:id", patchStudent)     // Частично обновить студента
+	// r.DELETE("/students/:id", deleteStudent)   // Удалить студента
 
-		w.Write(jsonData)
-	})
-
-	handler := cors.Default().Handler(http.DefaultServeMux)
-
-	log.Println("Starting server on :8080...")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	r.Run(":8080")
 }
