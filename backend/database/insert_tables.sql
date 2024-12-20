@@ -80,9 +80,9 @@ VALUES
 (12, 'Общее образование', 'bachelor'),
 (12, 'Кросс-дисциплинарные исследования', 'master');
 
-UPDATE course
-SET education_level = 'bachelor'
-WHERE education_level = 'postgraduate';
+--UPDATE course
+--SET education_level = 'bachelor'
+--WHERE education_level = 'postgraduate';
 
 
 -- Добавляем кафедры для каждого факультета
@@ -2076,3 +2076,113 @@ INSERT INTO student (department_id, course_id, surname, name, patronymic, year, 
 INSERT INTO student (department_id, course_id, surname, name, patronymic, year, phone_number, email, birth_date) VALUES (32, 41, 'Косарева', 'Елизавета', 'Игоревна', 2, '+79129838578', 'елизавета.косарева@mail.ru', '2005-05-12');
 INSERT INTO student (department_id, course_id, surname, name, patronymic, year, phone_number, email, birth_date) VALUES (33, 41, 'Хохлов', 'Евгений', 'Вячеславович', 2, '+79131759901', 'евгений.хохлов@example.com', '2004-06-03');
 INSERT INTO student (department_id, course_id, surname, name, patronymic, year, phone_number, email, birth_date) VALUES (32, 41, 'Тихонов', 'Александр', 'Алексеевич', 2, '+79148229006', 'александр.тихонов@example.com', '2003-12-21');
+
+-- Добавление квалификационных работ с уникальными названиями для студентов с year = 3
+WITH ranked_professors AS (
+    SELECT 
+        professor_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY professor_id) AS rn
+    FROM professor
+),
+ranked_students AS (
+    SELECT 
+        student_card_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY student_card_id) AS rn
+    FROM student
+    WHERE year = 3
+)
+INSERT INTO qualification_work (student_card_id, supervisor_id, "name", work_type, work_status)
+SELECT 
+    s.student_card_id, 
+    p.professor_id, 
+    CONCAT('Квалификационная работа №', s.student_card_id), 
+    'course', 
+    'in progress'
+FROM ranked_students s
+JOIN ranked_professors p 
+    ON s.department_id = p.department_id AND s.rn = p.rn;
+
+-- Добавление квалификационных работ с уникальными названиями для студентов с year = 4
+WITH ranked_professors AS (
+    SELECT 
+        professor_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY professor_id) AS rn
+    FROM professor
+),
+ranked_students AS (
+    SELECT 
+        student_card_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY student_card_id) AS rn
+    FROM student
+    WHERE year = 4
+)
+INSERT INTO qualification_work (student_card_id, supervisor_id, "name", work_type, work_status)
+SELECT 
+    s.student_card_id, 
+    p.professor_id, 
+    CONCAT('Квалификационная работа №', s.student_card_id), 
+    'diploma', 
+    'in progress'
+FROM ranked_students s
+JOIN ranked_professors p 
+    ON s.department_id = p.department_id AND s.rn = p.rn;
+
+-- Добавление квалификационных работ с уникальными названиями для студентов из магистратуры, year = 1
+WITH ranked_professors AS (
+    SELECT 
+        professor_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY professor_id) AS rn
+    FROM professor
+),
+ranked_students AS (
+    SELECT 
+        s.student_card_id, 
+        s.department_id, 
+        ROW_NUMBER() OVER (PARTITION BY s.department_id ORDER BY s.student_card_id) AS rn
+    FROM student s JOIN course c
+	ON s.course_id = c.course_id
+    WHERE c.education_level = 'master' AND s.year = 2
+)
+INSERT INTO qualification_work (student_card_id, supervisor_id, "name", work_type, work_status)
+SELECT 
+    s.student_card_id, 
+    p.professor_id, 
+    CONCAT('Квалификационная работа №', s.student_card_id), 
+    'master', 
+    'in progress'
+FROM ranked_students s
+JOIN ranked_professors p 
+    ON s.department_id = p.department_id AND s.rn = p.rn;
+
+-- Добавление квалификационных работ с уникальными названиями для студентов из аспирантуры, year = 3-4
+WITH ranked_professors AS (
+    SELECT 
+        professor_id, 
+        department_id, 
+        ROW_NUMBER() OVER (PARTITION BY department_id ORDER BY professor_id) AS rn
+    FROM professor
+),
+ranked_students AS (
+    SELECT 
+        s.student_card_id, 
+        s.department_id, 
+        ROW_NUMBER() OVER (PARTITION BY s.department_id ORDER BY s.student_card_id) AS rn
+    FROM student s JOIN course c
+	ON s.course_id = c.course_id
+    WHERE c.education_level = 'postgraduate' AND s.year = 3 or s.year = 4
+)
+INSERT INTO qualification_work (student_card_id, supervisor_id, "name", work_type, work_status)
+SELECT 
+    s.student_card_id, 
+    p.professor_id, 
+    CONCAT('Квалификационная работа №', s.student_card_id), 
+    'master', 
+    'in progress'
+FROM ranked_students s
+JOIN ranked_professors p 
+    ON s.department_id = p.department_id AND s.rn = p.rn;
