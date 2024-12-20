@@ -43,6 +43,7 @@ SELECT
     s.surname,
     s.name,
     s.patronymic,
+	s.birth_date,
     d."name" AS department_name
 FROM 
     student s
