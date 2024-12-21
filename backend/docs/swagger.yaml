@@ -1,0 +1,378 @@
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        example: Some error info
+        type: string
+    type: object
+  main.Professor:
+    properties:
+      department_id:
+        type: integer
+      full_name:
+        type: string
+      professor_id:
+        type: integer
+    type: object
+  main.QualificationWork:
+    properties:
+      grade:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      supervisor:
+        type: string
+      work_status:
+        type: string
+      work_type:
+        type: string
+    type: object
+  main.Student:
+    properties:
+      avatar:
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      faculty:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      patronomyc:
+        type: string
+      phone:
+        type: string
+    type: object
+  main.StudentCard:
+    properties:
+      qualification_works:
+        items:
+          $ref: '#/definitions/main.QualificationWork'
+        type: array
+      student:
+        $ref: '#/definitions/main.Student'
+    type: object
+  main.StudentPage:
+    properties:
+      page_num:
+        type: integer
+      page_size:
+        type: integer
+      students:
+        items:
+          $ref: '#/definitions/main.Student'
+        type: array
+    type: object
+info:
+  contact: {}
+  title: Student DataBase API
+paths:
+  /add_qualification_work:
+    post:
+      consumes:
+      - application/json
+      description: Добавить квалификационную работу
+      parameters:
+      - description: ID студента
+        in: query
+        name: student_id
+        required: true
+        type: integer
+      - description: ID профессора
+        in: query
+        name: supervisor_id
+        required: true
+        type: integer
+      - description: Наименование работы
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Тип работы
+        enum:
+        - course
+        - diploma
+        - master
+        - dissertation
+        in: query
+        name: work_type
+        required: true
+        type: string
+      - description: Статус работы
+        enum:
+        - complete
+        - in progress
+        in: query
+        name: work_status
+        type: string
+      - description: Оценка
+        in: query
+        name: grade
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Добавление квалификационной работы
+  /add_student:
+    post:
+      consumes:
+      - application/json
+      description: Добавление нового студента
+      parameters:
+      - description: Имя
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Фамилия
+        in: query
+        name: surname
+        required: true
+        type: string
+      - description: Отчество
+        in: query
+        name: patronymic
+        required: true
+        type: string
+      - description: Номер телефона
+        in: query
+        name: phone_number
+        type: string
+      - description: Адрес электронной почты
+        in: query
+        name: email
+        type: string
+      - description: Дата рождения
+        format: date
+        in: query
+        name: birth_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Добавление студента
+  /archive_student:
+    put:
+      consumes:
+      - application/json
+      description: Архивировать студента
+      parameters:
+      - default: 1
+        description: ID студента
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Архивация студента
+  /delete_student:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить студента
+      parameters:
+      - default: 1
+        description: ID студента
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Удаление студента
+  /professors:
+    get:
+      consumes:
+      - application/json
+      description: Список профессоров
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Professor'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Список профессоров
+  /student_card:
+    get:
+      consumes:
+      - application/json
+      description: Вывести карточку с подробной информаций о студенте
+      parameters:
+      - default: 1
+        description: ID студента
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StudentCard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Карточка студента
+  /students_page:
+    get:
+      consumes:
+      - application/json
+      description: Вывести спискок студентов для отображения на странице
+      parameters:
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Число студентов на странице
+        in: query
+        name: pageSize
+        type: integer
+      - description: Фильтрация по ID кафедры
+        in: query
+        name: depatmentId
+        type: integer
+      - description: Фильтрация по ID факультета
+        in: query
+        name: facultyId
+        type: integer
+      - description: Фильтрация по номеру курса
+        in: query
+        name: course
+        type: integer
+      - default: '"ASC"'
+        description: Порядок сортировки
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StudentPage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Список студентов
+  /update_student:
+    put:
+      consumes:
+      - application/json
+      description: Обновление информации о студенте
+      parameters:
+      - description: Имя
+        in: query
+        name: name
+        type: string
+      - description: Фамилия
+        in: query
+        name: surname
+        type: string
+      - description: Отчество
+        in: query
+        name: patronymic
+        type: string
+      - description: Номер телефона
+        in: query
+        name: phone_number
+        type: string
+      - description: Адрес электронной почты
+        in: query
+        name: email
+        type: string
+      - description: Дата рождения
+        format: date
+        in: query
+        name: birth_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Обновление студента
+swagger: "2.0"

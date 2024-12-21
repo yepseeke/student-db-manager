@@ -1,39 +1,51 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
+	"fmt"
+	"go-app/config"
+	"go-app/docs"
 	"log"
-	"net/http"
 
-	"github.com/rs/cors"
+	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+var db *sql.DB
+
+// @title Student DataBase API
 func main() {
-	db, err := ConnectDB()
+	// initialize gin
+	r := gin.Default()
+	r.SetTrustedProxies([]string{config.GetProxy()})
+	// initialize swagger
+	docs.SwaggerInfo.BasePath = "/"
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// connect to database
+	var err error
+	db_params := fmt.Sprintf("user=%s password=%s dbname=students_registry sslmode=disable",
+		config.GetUser(), config.GetPassword())
+	db, err = sql.Open("postgres", db_params)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	http.HandleFunc("/students", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		students, err := GetStudents(db)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	// endpoints
+	r.GET("/students_page", getStudentsPage)
+	r.POST("/add_student", addStudent)
+	r.GET("/student_card", getStudentCard)
+	r.PUT("/update_student", updateStudent)
+	r.PUT("/archive_student", archiveStudent)
+	r.DELETE("/delete_student", deleteStudent)
+	r.POST("/add_qualification_work", addQualifiactionWork)
+	r.GET("/professors", getProfessors)
+	r.GET("/faculties", getFaculties)
+	r.GET("/departments", getDepartments)
 
-		jsonData, err := json.Marshal(students)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(jsonData)
-	})
-
-	handler := cors.Default().Handler(http.DefaultServeMux)
-
-	log.Println("Starting server on :8080...")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	// listen and serve
+	r.Run(config.GetHostAndPort())
 }
