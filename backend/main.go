@@ -26,8 +26,8 @@ func main() {
 
 	// connect to database
 	var err error
-	db_params := fmt.Sprintf("user=%s password=%s dbname=students_registry sslmode=disable",
-		config.GetUser(), config.GetPassword())
+	db_params := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.GetDbHost(), config.GetDbPort(), config.GetUser(), config.GetPassword(), config.GetDbName())
 	db, err = sql.Open("postgres", db_params)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)

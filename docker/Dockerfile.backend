@@ -1,0 +1,32 @@
+# Use the official Golang image as a build stage
+FROM golang:1.23 AS builder
+
+# Set the Current Working Directory inside the container
+WORKDIR /app
+
+# Copy go.mod and go.sum files
+COPY ./backend/go.mod ./backend/go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+RUN go mod download
+
+# Copy the source code into the container
+COPY ./backend/ .
+
+# Build the Go app
+RUN go build -o myapp .
+
+# Start a new stage from scratch
+FROM alpine:latest
+
+# Install any necessary packages (e.g., libc6-compat for compatibility)
+RUN apk add --no-cache libc6-compat
+
+# Set the Current Working Directory inside the container
+WORKDIR /root/
+
+# Copy the Pre-built binary file from the previous stage
+COPY --from=builder /app/myapp .
+
+# Command to run the executable
+CMD ["./myapp"]
