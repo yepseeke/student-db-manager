@@ -2,30 +2,50 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+	"go-app/config"
+	"go-app/docs"
 	"log"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq" // PostgreSQL driver
+	_ "github.com/lib/pq"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var db *sql.DB
 
+// @title Student DataBase API
 func main() {
+	// initialize gin
+	r := gin.Default()
+	r.SetTrustedProxies([]string{config.GetProxy()})
+	// initialize swagger
+	docs.SwaggerInfo.BasePath = "/"
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// connect to database
 	var err error
-	db, err = sql.Open("postgres", "user=postgres password=6902 dbname=student_registry sslmode=disable")
+	db_params := fmt.Sprintf("user=%s password=%s dbname=students_registry sslmode=disable",
+		config.GetUser(), config.GetPassword())
+	db, err = sql.Open("postgres", db_params)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	r := gin.Default()
+	// endpoints
+	r.GET("/students_page", getStudentsPage)
+	r.POST("/add_student", addStudent)
+	r.GET("/student_card", getStudentCard)
+	r.PUT("/update_student", updateStudent)
+	r.PUT("/archive_student", archiveStudent)
+	r.DELETE("/delete_student", deleteStudent)
+	r.POST("/add_qualification_work", addQualifiactionWork)
+	r.GET("/professors", getProfessors)
+	r.GET("/faculties", getFaculties)
+	r.GET("/departments", getDepartments)
 
-	r.GET("/students", getStudents) // Получить список студентов
-	// r.POST("/students", addStudent)            // Добавить студента
-	// r.GET("/students/:id", getStudentDetails)  // Получить детали студента
-	// r.PUT("/students/:id", updateStudent)      // Полностью обновить студента
-	// r.PATCH("/students/:id", patchStudent)     // Частично обновить студента
-	// r.DELETE("/students/:id", deleteStudent)   // Удалить студента
-
-	r.Run(":8080")
+	// listen and serve
+	r.Run(config.GetHostAndPort())
 }
