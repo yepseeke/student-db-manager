@@ -59,7 +59,10 @@ CREATE TABLE IF NOT EXISTS student (
     surname character varying(50) NOT NULL,
     "name" character varying(50) NOT NULL,
     patronymic character varying(50) NOT NULL,
-	"year" integer NOT NULL
+	"year" integer NOT NULL,
+	phone_number VARCHAR(15) NOT NULL,
+	email VARCHAR(50) NOT NULL,
+	birth_date date NOT NULL
 );
 
 CREATE TABLE qualification_work (

@@ -39,10 +39,12 @@ FROM department
 каждого студента его кафедру*/
 SELECT 
     c."name" AS course_name,
+	s.student_card_id,
     s.year,
     s.surname,
     s.name,
     s.patronymic,
+	s.birth_date,
     d."name" AS department_name
 FROM 
     student s
@@ -175,3 +177,22 @@ FROM
 
 ORDER BY 
     faculty_name;
+
+
+SELECT qw.work_id, 
+	   qw.name,
+       p.surname AS supervisor_surname, 
+       p.name AS supervisor_name, 
+       p.patronymic AS supervisor_patronymic,
+       s.surname AS student_surname, 
+       s.name AS student_name, 
+       s.patronymic AS student_patronymic,
+	   s.year,
+	   c.education_level,
+       d.name AS department_name
+FROM qualification_work qw
+JOIN professor p ON qw.supervisor_id = p.professor_id
+JOIN student s ON qw.student_card_id = s.student_card_id
+JOIN department d ON s.department_id = d.department_id
+JOIN course c ON s.course_id = c.course_id
+ORDER BY qw.student_card_id;
