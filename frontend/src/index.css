@@ -1,9 +1,16 @@
+@font-face {
+  font-family: 'Alice';
+  src: url('./Alice-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   background-color: black;
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: Alice, sans-serif;
 }
 
 @media (max-width: 768px) {

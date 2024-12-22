@@ -35,6 +35,7 @@
 }
 
 .add-student-button {
+    font-family: Alice, sans-serif;
     background-color: #ff80b4;
     border: none;
     color: white;
