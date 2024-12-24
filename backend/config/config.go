@@ -15,11 +15,11 @@ func getEnvWithDefaultLookup(key, defaultValue string) string {
 }
 
 func init() {
-	HOST = getEnvWithDefaultLookup("HOST", "0.0.0.0")
-	PORT = getEnvWithDefaultLookup("PORT", "8080")
-	PROXY = getEnvWithDefaultLookup("PROXY", "127.0.0.1")
-	USER = getEnvWithDefaultLookup("USER", "postgres")
-	PASSWORD = getEnvWithDefaultLookup("PASSWORD", "admin")
+	HOST = getEnvWithDefaultLookup("STDB_HOST", "0.0.0.0")
+	PORT = getEnvWithDefaultLookup("STDB_PORT", "8080")
+	PROXY = getEnvWithDefaultLookup("STDB_PROXY", "127.0.0.1")
+	USER = getEnvWithDefaultLookup("STDB_USER", "postgres")
+	PASSWORD = getEnvWithDefaultLookup("STDB_PASSWORD", "admin")
 }
 
 func GetHostAndPort() string {

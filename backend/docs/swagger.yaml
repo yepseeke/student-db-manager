@@ -70,6 +70,26 @@ definitions:
     type: object
   main.Student:
     properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      patronomyc:
+        type: string
+    type: object
+  main.StudentCard:
+    properties:
+      qualification_works:
+        items:
+          $ref: '#/definitions/main.QualificationWork'
+        type: array
+      student:
+        $ref: '#/definitions/main.StudentDetailed'
+    type: object
+  main.StudentDetailed:
+    properties:
       archived:
         type: boolean
       avatar:
@@ -91,15 +111,6 @@ definitions:
       phone:
         type: string
     type: object
-  main.StudentCard:
-    properties:
-      qualification_works:
-        items:
-          $ref: '#/definitions/main.QualificationWork'
-        type: array
-      student:
-        $ref: '#/definitions/main.Student'
-    type: object
   main.StudentPage:
     properties:
       page_num:
@@ -108,21 +119,10 @@ definitions:
         type: integer
       students:
         items:
-          $ref: '#/definitions/main.StudentResponse'
+          $ref: '#/definitions/main.Student'
         type: array
       total_pages:
         type: integer
-    type: object
-  main.StudentResponse:
-    properties:
-      first_name:
-        type: string
-      id:
-        type: integer
-      last_name:
-        type: string
-      patronomyc:
-        type: string
     type: object
 info:
   contact: {}

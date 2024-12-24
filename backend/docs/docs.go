@@ -655,6 +655,37 @@ const docTemplate = `{
         "main.Student": {
             "type": "object",
             "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "patronomyc": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.StudentCard": {
+            "type": "object",
+            "properties": {
+                "qualification_works": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.QualificationWork"
+                    }
+                },
+                "student": {
+                    "$ref": "#/definitions/main.StudentDetailed"
+                }
+            }
+        },
+        "main.StudentDetailed": {
+            "type": "object",
+            "properties": {
                 "archived": {
                     "type": "boolean"
                 },
@@ -687,20 +718,6 @@ const docTemplate = `{
                 }
             }
         },
-        "main.StudentCard": {
-            "type": "object",
-            "properties": {
-                "qualification_works": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/main.QualificationWork"
-                    }
-                },
-                "student": {
-                    "$ref": "#/definitions/main.Student"
-                }
-            }
-        },
         "main.StudentPage": {
             "type": "object",
             "properties": {
@@ -713,28 +730,11 @@ const docTemplate = `{
                 "students": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.StudentResponse"
+                        "$ref": "#/definitions/main.Student"
                     }
                 },
                 "total_pages": {
                     "type": "integer"
-                }
-            }
-        },
-        "main.StudentResponse": {
-            "type": "object",
-            "properties": {
-                "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "patronomyc": {
-                    "type": "string"
                 }
             }
         }
