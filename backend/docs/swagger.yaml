@@ -1,9 +1,41 @@
 definitions:
+  main.Department:
+    properties:
+      faculty_id:
+        type: integer
+      head_name:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  main.DepartmentList:
+    properties:
+      departments:
+        items:
+          $ref: '#/definitions/main.Department'
+        type: array
+    type: object
   main.ErrorResponse:
     properties:
       error:
         example: Some error info
         type: string
+    type: object
+  main.Faculty:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  main.FacultyList:
+    properties:
+      faculties:
+        items:
+          $ref: '#/definitions/main.Faculty'
+        type: array
     type: object
   main.Professor:
     properties:
@@ -11,8 +43,15 @@ definitions:
         type: integer
       full_name:
         type: string
-      professor_id:
+      id:
         type: integer
+    type: object
+  main.ProfessorList:
+    properties:
+      professors:
+        items:
+          $ref: '#/definitions/main.Professor'
+        type: array
     type: object
   main.QualificationWork:
     properties:
@@ -31,6 +70,8 @@ definitions:
     type: object
   main.Student:
     properties:
+      archived:
+        type: boolean
       avatar:
         type: string
       department:
@@ -67,8 +108,21 @@ definitions:
         type: integer
       students:
         items:
-          $ref: '#/definitions/main.Student'
+          $ref: '#/definitions/main.StudentResponse'
         type: array
+      total_pages:
+        type: integer
+    type: object
+  main.StudentResponse:
+    properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      patronomyc:
+        type: string
     type: object
 info:
   contact: {}
@@ -223,6 +277,56 @@ paths:
           schema:
             $ref: '#/definitions/main.ErrorResponse'
       summary: Удаление студента
+  /departments:
+    get:
+      consumes:
+      - application/json
+      description: Список кафедр
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DepartmentList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Список кафедр
+  /faculties:
+    get:
+      consumes:
+      - application/json
+      description: Список факультетов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.FacultyList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Список факультетов
   /professors:
     get:
       consumes:
@@ -234,9 +338,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/main.Professor'
-            type: array
+            $ref: '#/definitions/main.ProfessorList'
         "400":
           description: Bad Request
           schema:
@@ -317,6 +419,7 @@ paths:
         - DESC
         in: query
         name: order
+        required: true
         type: string
       produces:
       - application/json
@@ -344,6 +447,11 @@ paths:
       - application/json
       description: Обновление информации о студенте
       parameters:
+      - description: ID студента
+        in: query
+        name: id
+        required: true
+        type: string
       - description: Имя
         in: query
         name: name

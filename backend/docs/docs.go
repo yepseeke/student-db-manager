@@ -234,6 +234,82 @@ const docTemplate = `{
                 }
             }
         },
+        "/departments": {
+            "get": {
+                "description": "Список кафедр",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Список кафедр",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DepartmentList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/faculties": {
+            "get": {
+                "description": "Список факультетов",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Список факультетов",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.FacultyList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/professors": {
             "get": {
                 "description": "Список профессоров",
@@ -248,10 +324,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.Professor"
-                            }
+                            "$ref": "#/definitions/main.ProfessorList"
                         }
                     },
                     "400": {
@@ -375,7 +448,8 @@ const docTemplate = `{
                         "default": "\"ASC\"",
                         "description": "Порядок сортировки",
                         "name": "order",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -417,6 +491,13 @@ const docTemplate = `{
                 ],
                 "summary": "Обновление студента",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID студента",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Имя",
@@ -464,12 +545,62 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.Department": {
+            "type": "object",
+            "properties": {
+                "faculty_id": {
+                    "type": "integer"
+                },
+                "head_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.DepartmentList": {
+            "type": "object",
+            "properties": {
+                "departments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Department"
+                    }
+                }
+            }
+        },
         "main.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "Some error info"
+                }
+            }
+        },
+        "main.Faculty": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.FacultyList": {
+            "type": "object",
+            "properties": {
+                "faculties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Faculty"
+                    }
                 }
             }
         },
@@ -482,8 +613,19 @@ const docTemplate = `{
                 "full_name": {
                     "type": "string"
                 },
-                "professor_id": {
+                "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "main.ProfessorList": {
+            "type": "object",
+            "properties": {
+                "professors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Professor"
+                    }
                 }
             }
         },
@@ -513,6 +655,9 @@ const docTemplate = `{
         "main.Student": {
             "type": "object",
             "properties": {
+                "archived": {
+                    "type": "boolean"
+                },
                 "avatar": {
                     "type": "string"
                 },
@@ -568,8 +713,28 @@ const docTemplate = `{
                 "students": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.Student"
+                        "$ref": "#/definitions/main.StudentResponse"
                     }
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.StudentResponse": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "patronomyc": {
+                    "type": "string"
                 }
             }
         }

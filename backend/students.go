@@ -33,6 +33,13 @@ const (
 	InProgress WorkStatus = "in progress"
 )
 
+type StudentResponse struct {
+	ID         int    `json:"id"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	Patronomyc string `json:"patronomyc"`
+}
+
 type Student struct {
 	ID         int     `json:"id"`
 	FirstName  string  `json:"first_name"`
@@ -43,6 +50,7 @@ type Student struct {
 	Faculty    *string `json:"faculty,omitempty"`
 	Email      *string `json:"email,omitempty"`
 	Phone      *string `json:"phone,omitempty"`
+	Archived   *bool   `json:"archived"`
 }
 
 type QualificationWork struct {
@@ -55,9 +63,10 @@ type QualificationWork struct {
 }
 
 type StudentPage struct {
-	Students []Student `json:"students"`
-	PageNum  int       `json:"page_num"`
-	PageSize int       `json:"page_size"`
+	Students   []StudentResponse `json:"students"`
+	PageNum    int               `json:"page_num"`
+	PageSize   int               `json:"page_size"`
+	TotalPages int               `json:"total_pages"`
 }
 
 type StudentCard struct {
@@ -65,14 +74,38 @@ type StudentCard struct {
 	QualificationWorks []QualificationWork `json:"qualification_works"`
 }
 
-type ErrorResponse struct {
-	Error string `json:"error" example:"Some error info"`
-}
-
 type Professor struct {
-	ProfessorId  int    `json:"professor_id"`
+	ID           int    `json:"id"`
 	DepartmentId int    `json:"department_id"`
 	FullName     string `json:"full_name"`
+}
+
+type ProfessorList struct {
+	Professors []Professor `json:"professors"`
+}
+
+type Faculty struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type FacultyList struct {
+	Faculties []Faculty `json:"faculties"`
+}
+
+type Department struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	FacultyId int    `json:"faculty_id"`
+	HeadName  string `json:"head_name"`
+}
+
+type DepartmentList struct {
+	Departments []Department `json:"departments"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error" example:"Some error info"`
 }
 
 // @Summary Список студентов
@@ -84,7 +117,7 @@ type Professor struct {
 // @Param depatmentId query int false "Фильтрация по ID кафедры"
 // @Param facultyId query int false "Фильтрация по ID факультета"
 // @Param course query int false "Фильтрация по номеру курса"
-// @Param order query SortOrder false "Порядок сортировки" default("ASC")
+// @Param order query SortOrder true "Порядок сортировки" default("ASC")
 // @Success 200 {object} StudentPage
 // @Failure 404 {object} ErrorResponse
 // @Failure 400 {object} ErrorResponse
@@ -109,22 +142,31 @@ func getStudentsPage(c *gin.Context) {
 		WHERE 1 = 1
 	`
 
+	countQuery := `
+		SELECT COUNT(*)
+		FROM student
+		WHERE 1 = 1
+	`
+
 	args := []interface{}{}
 	argIndex := 1
 
 	// Условия фильтрации
 	if departmentId != "" {
-		baseQuery += fmt.Sprintf(` AND department_id = $%d)`, argIndex)
+		baseQuery += fmt.Sprintf(` AND department_id = $%d`, argIndex)
+		countQuery += fmt.Sprintf(` AND department_id = $%d`, argIndex)
 		args = append(args, departmentId)
 		argIndex++
 	}
 	if facultyId != "" {
-		baseQuery += fmt.Sprintf(` AND faculty_id = $%d)`, argIndex)
+		baseQuery += fmt.Sprintf(` AND faculty_id = $%d`, argIndex)
+		countQuery += fmt.Sprintf(` AND faculty_id = $%d`, argIndex)
 		args = append(args, facultyId)
 		argIndex++
 	}
 	if course != "" {
 		baseQuery += fmt.Sprintf(` AND course_id = $%d`, argIndex)
+		countQuery += fmt.Sprintf(` AND course_id = $%d`, argIndex)
 		args = append(args, course)
 		argIndex++
 	}
@@ -137,7 +179,7 @@ func getStudentsPage(c *gin.Context) {
 	rows, err := db.Query(baseQuery, args...)
 	if err != nil {
 		log.Printf("Error executing query: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch students"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch students" + baseQuery})
 		return
 	}
 	defer rows.Close()
@@ -154,11 +196,23 @@ func getStudentsPage(c *gin.Context) {
 		students = append(students, s)
 	}
 
+	// Обсчет числа страниц
+	var count int
+	err = db.QueryRow(countQuery, args...).Scan(&count)
+	if err != nil {
+		log.Fatal(err)
+	}
+	totalPages := count / pageSizeNum
+	if count%pageSizeNum != 0 {
+		totalPages++
+	}
+
 	// Формируем и возвращаем ответ
 	response := gin.H{
-		"page":     pageNum,
-		"pageSize": pageSizeNum,
-		"students": students,
+		"page_num":    pageNum,
+		"page_size":   pageSizeNum,
+		"students":    students,
+		"total_pages": totalPages,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -189,7 +243,7 @@ func getStudentCard(c *gin.Context) {
 	}
 
 	// find student
-	studentQuery := "SELECT s.student_card_id, s.name, s.surname, s.patronymic, s.phone_number, s.email , d.name, f.name\n" +
+	studentQuery := "SELECT s.student_card_id, s.name, s.surname, s.patronymic, s.phone_number, s.email , d.name, f.name, s.archived\n" +
 		"FROM student AS s\n" +
 		"JOIN department as d\n" +
 		"ON d.department_id = s.department_id\n" +
@@ -200,7 +254,7 @@ func getStudentCard(c *gin.Context) {
 	row := db.QueryRow(studentQuery, id)
 	var student Student
 	err = row.Scan(&student.ID, &student.FirstName, &student.LastName, &student.Patronomyc,
-		&student.Phone, &student.Email, &student.Department, &student.Faculty)
+		&student.Phone, &student.Email, &student.Department, &student.Faculty, &student.Archived)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Student not found"})
 		return
@@ -272,6 +326,7 @@ func addStudent(c *gin.Context) {
 // @Description Обновление информации о студенте
 // @Accept json
 // @Produce json
+// @Param id query string true "ID студента"
 // @Param name query string false "Имя"
 // @Param surname query string false "Фамилия"
 // @Param patronymic query string false "Отчество"
@@ -295,7 +350,7 @@ func updateStudent(c *gin.Context) {
 	}
 
 	// check if there is a student
-	studentQuery := "SELECT * FROM student WHERE student_card_id = ? AND archived = False"
+	studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
 	var count int
 	err = db.QueryRow(studentQuery, id).Scan(&count)
 	if err != nil {
@@ -303,7 +358,7 @@ func updateStudent(c *gin.Context) {
 		return
 	}
 
-	updateQuery := "UPDATE `students` SET `archived` = true WHERE `id` = ?"
+	updateQuery := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
 
 	_, err = db.Exec(updateQuery, id)
 	if err != nil {
@@ -339,15 +394,15 @@ func archiveStudent(c *gin.Context) {
 	}
 
 	// check if there is a student
-	studentQuery := "SELECT * FROM student WHERE student_card_id = ? AND archived = False"
+	studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
 	var count int
 	err = db.QueryRow(studentQuery, id).Scan(&count)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Student doesnt exist or archived"})
+	if count == 0 || err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "student archived or not exists"})
 		return
 	}
 
-	updateQuery := "UPDATE student SET archived = true WHERE student_card_id = ?"
+	updateQuery := "UPDATE student SET archived = true WHERE student_card_id = $1"
 
 	_, err = db.Exec(updateQuery, id)
 	if err != nil {
@@ -382,7 +437,7 @@ func deleteStudent(c *gin.Context) {
 		return
 	}
 
-	updateQuery := "DELETE student WHERE student_card_id = ?"
+	updateQuery := "DELETE student WHERE student_card_id = $1"
 
 	_, err = db.Exec(updateQuery, id)
 	if err != nil {
@@ -406,26 +461,110 @@ func deleteStudent(c *gin.Context) {
 // @Success 200
 // @Router /add_qualification_work [post]
 func addQualifiactionWork(c *gin.Context) {
-	return
+	c.Status(http.StatusOK)
 }
 
 // @Summary Список профессоров
 // @Description Список профессоров
 // @Accept json
 // @Produce json
-// @Success 200 {array} Professor
+// @Success 200 {object} ProfessorList
 // @Failure 404 {object} ErrorResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /professors [get]
 func getProfessors(c *gin.Context) {
+	rows, err := db.Query("SELECT surname || ' ' || name || ' ' || patronymic, professor_id, department_id FROM professor")
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch professors"})
+		return
+	}
+	defer rows.Close()
+	var professors []Professor
+	for rows.Next() {
+		var p Professor
+		if err := rows.Scan(&p.FullName, &p.ID, &p.DepartmentId); err != nil {
+			log.Printf("Error scanning row: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse professor data"})
+			return
+		}
+		professors = append(professors, p)
+	}
 
+	response := gin.H{
+		"professors": professors,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Список факультетов
+// @Description Список факультетов
+// @Accept json
+// @Produce json
+// @Success 200 {object} FacultyList
+// @Failure 404 {object} ErrorResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /faculties [get]
 func getFaculties(c *gin.Context) {
+	rows, err := db.Query("SELECT faculty_id, name FROM faculty")
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch faculties"})
+		return
+	}
+	defer rows.Close()
+	var faculties []Faculty
+	for rows.Next() {
+		var f Faculty
+		if err := rows.Scan(&f.ID, &f.Name); err != nil {
+			log.Printf("Error scanning row: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse faculty data"})
+			return
+		}
+		faculties = append(faculties, f)
+	}
 
+	response := gin.H{
+		"faculties": faculties,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
+// @Summary Список кафедр
+// @Description Список кафедр
+// @Accept json
+// @Produce json
+// @Success 200 {object} DepartmentList
+// @Failure 404 {object} ErrorResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /departments [get]
 func getDepartments(c *gin.Context) {
+	rows, err := db.Query("SELECT d.department_id, d.faculty_id, d.name, p.surname || ' ' || p.name || ' ' || p.patronymic FROM department AS d JOIN professor AS p ON d.department_head_id = p.professor_id")
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch departments"})
+		return
+	}
+	defer rows.Close()
+	var departments []Department
+	for rows.Next() {
+		var d Department
+		if err := rows.Scan(&d.ID, &d.FacultyId, &d.Name, &d.HeadName); err != nil {
+			log.Printf("Error scanning row: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse department data"})
+			return
+		}
+		departments = append(departments, d)
+	}
 
+	response := gin.H{
+		"departments": departments,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
