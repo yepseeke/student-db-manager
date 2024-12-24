@@ -31,7 +31,7 @@ go run main.go
 
 ### Done list
 
-- [ ] /students_page -- баг с факультетом :)
+- [x] /students_page
 - [ ] /add_student
 - [x] /student_card
 - [ ] /update_student
