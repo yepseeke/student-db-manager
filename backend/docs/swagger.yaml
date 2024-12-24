@@ -1,20 +1,59 @@
 definitions:
-  main.ErrorResponse:
+  handlers.Department:
+    properties:
+      faculty_id:
+        type: integer
+      head_name:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  handlers.DepartmentList:
+    properties:
+      departments:
+        items:
+          $ref: '#/definitions/handlers.Department'
+        type: array
+    type: object
+  handlers.ErrorResponse:
     properties:
       error:
         example: Some error info
         type: string
     type: object
-  main.Professor:
+  handlers.Faculty:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  handlers.FacultyList:
+    properties:
+      faculties:
+        items:
+          $ref: '#/definitions/handlers.Faculty'
+        type: array
+    type: object
+  handlers.Professor:
     properties:
       department_id:
         type: integer
       full_name:
         type: string
-      professor_id:
+      id:
         type: integer
     type: object
-  main.QualificationWork:
+  handlers.ProfessorList:
+    properties:
+      professors:
+        items:
+          $ref: '#/definitions/handlers.Professor'
+        type: array
+    type: object
+  handlers.QualificationWork:
     properties:
       grade:
         type: integer
@@ -29,8 +68,30 @@ definitions:
       work_type:
         type: string
     type: object
-  main.Student:
+  handlers.Student:
     properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      patronomyc:
+        type: string
+    type: object
+  handlers.StudentCard:
+    properties:
+      qualification_works:
+        items:
+          $ref: '#/definitions/handlers.QualificationWork'
+        type: array
+      student:
+        $ref: '#/definitions/handlers.StudentDetailed'
+    type: object
+  handlers.StudentDetailed:
+    properties:
+      archived:
+        type: boolean
       avatar:
         type: string
       department:
@@ -50,16 +111,7 @@ definitions:
       phone:
         type: string
     type: object
-  main.StudentCard:
-    properties:
-      qualification_works:
-        items:
-          $ref: '#/definitions/main.QualificationWork'
-        type: array
-      student:
-        $ref: '#/definitions/main.Student'
-    type: object
-  main.StudentPage:
+  handlers.StudentPage:
     properties:
       page_num:
         type: integer
@@ -67,8 +119,10 @@ definitions:
         type: integer
       students:
         items:
-          $ref: '#/definitions/main.Student'
+          $ref: '#/definitions/handlers.Student'
         type: array
+      total_pages:
+        type: integer
     type: object
 info:
   contact: {}
@@ -183,15 +237,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Архивация студента
   /delete_student:
     delete:
@@ -213,16 +267,66 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Удаление студента
+  /departments:
+    get:
+      consumes:
+      - application/json
+      description: Список кафедр
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.DepartmentList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список кафедр
+  /faculties:
+    get:
+      consumes:
+      - application/json
+      description: Список факультетов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FacultyList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список факультетов
   /professors:
     get:
       consumes:
@@ -234,21 +338,19 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/main.Professor'
-            type: array
+            $ref: '#/definitions/handlers.ProfessorList'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Список профессоров
   /student_card:
     get:
@@ -268,19 +370,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.StudentCard'
+            $ref: '#/definitions/handlers.StudentCard'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Карточка студента
   /students_page:
     get:
@@ -317,6 +419,7 @@ paths:
         - DESC
         in: query
         name: order
+        required: true
         type: string
       produces:
       - application/json
@@ -324,19 +427,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.StudentPage'
+            $ref: '#/definitions/handlers.StudentPage'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ErrorResponse'
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Список студентов
   /update_student:
     put:
@@ -344,6 +447,11 @@ paths:
       - application/json
       description: Обновление информации о студенте
       parameters:
+      - description: ID студента
+        in: query
+        name: id
+        required: true
+        type: string
       - description: Имя
         in: query
         name: name
