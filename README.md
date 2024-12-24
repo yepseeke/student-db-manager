@@ -31,17 +31,19 @@ go run main.go
 
 ### Done list
 
-- [ ] /students_page
+- [ ] /students_page -- баг с факультетом :)
 - [ ] /add_student
-- [ ] /student_card
+- [x] /student_card
 - [ ] /update_student
-- [ ] /archive_student
-- [ ] /delete_student
+- [x] /archive_student
+- [x] /delete_student
 - [ ] /add_qualification_work
-- [ ] /professors
+- [x] /professors
 - [x] /faculties
 - [x] /departments
 
 ### TODO
 
 - Уровень логирования + logrus
+- Нормальная валидация входных данных и убрать говнокод с этим связанный
+- Кривая передача TypeOf в template-функцию (не понимаю как в golang с таким работать)

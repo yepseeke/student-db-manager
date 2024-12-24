@@ -11,6 +11,48 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// пиздец запрос, как можно так наговнокдить было
+func generatePageQueries(departmentId string, facultyId string, course string,
+	pageNum int, pageSizeNum int, order string) (string, string) {
+
+	baseQuery := `
+		SELECT student_card_id, "name", surname, patronymic 
+		FROM student
+		WHERE 1 = 1`
+
+	countQuery := `
+		SELECT COUNT(*)
+		FROM student
+		WHERE 1 = 1`
+
+	// Условия фильтрации
+	if departmentId != "" {
+		baseQuery += fmt.Sprintf(" AND department_id = $%s", departmentId)
+		countQuery += fmt.Sprintf(" AND department_id = $%s", departmentId)
+	}
+	if facultyId != "" {
+		baseQuery += fmt.Sprintf(" AND faculty_id = $%s", facultyId)
+		countQuery += fmt.Sprintf(" AND faculty_id = $%s", facultyId)
+	}
+	if course != "" {
+		baseQuery += fmt.Sprintf(` AND course_id = $%s`, course)
+		countQuery += fmt.Sprintf(` AND course_id = $%s`, course)
+	}
+
+	// pagination
+	offset := (pageNum - 1) * pageSizeNum
+	baseQuery += fmt.Sprintf(" ORDER BY surname %s LIMIT %d OFFSET %d", order, pageSizeNum, offset)
+
+	return baseQuery, countQuery
+}
+
+func checkStudentActive(db *sql.DB, id int) bool {
+	studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
+	var count int
+	err := db.QueryRow(studentQuery, id).Scan(&count)
+	return err != nil
+}
+
 // @Summary Список студентов
 // @Description Вывести спискок студентов для отображения на странице
 // @Accept json
@@ -28,7 +70,6 @@ import (
 // @Router /students_page [get]
 func GetStudentsPage(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Читаем параметры запроса
 		page := c.DefaultQuery("page", "")
 		pageSize := c.DefaultQuery("pageSize", "")
 		departmentId := c.DefaultQuery("departmentId", "")
@@ -40,69 +81,18 @@ func GetStudentsPage(db *sql.DB) gin.HandlerFunc {
 		fmt.Sscanf(page, "%d", &pageNum)
 		fmt.Sscanf(pageSize, "%d", &pageSizeNum)
 
-		baseQuery := `
-		SELECT student_card_id, "name", surname, patronymic 
-		FROM student
-		WHERE 1 = 1
-	`
+		baseQuery, countQuery := generatePageQueries(departmentId, facultyId, course, pageNum, pageSizeNum, order)
 
-		countQuery := `
-		SELECT COUNT(*)
-		FROM student
-		WHERE 1 = 1
-	`
-
-		args := []interface{}{}
-		argIndex := 1
-
-		// Условия фильтрации
-		if departmentId != "" {
-			baseQuery += fmt.Sprintf(` AND department_id = $%d`, argIndex)
-			countQuery += fmt.Sprintf(` AND department_id = $%d`, argIndex)
-			args = append(args, departmentId)
-			argIndex++
-		}
-		if facultyId != "" {
-			baseQuery += fmt.Sprintf(` AND faculty_id = $%d`, argIndex)
-			countQuery += fmt.Sprintf(` AND faculty_id = $%d`, argIndex)
-			args = append(args, facultyId)
-			argIndex++
-		}
-		if course != "" {
-			baseQuery += fmt.Sprintf(` AND course_id = $%d`, argIndex)
-			countQuery += fmt.Sprintf(` AND course_id = $%d`, argIndex)
-			args = append(args, course)
-			argIndex++
-		}
-
-		// Пагинация
-		offset := (pageNum - 1) * pageSizeNum
-		baseQuery += fmt.Sprintf(" ORDER BY surname %s LIMIT %d OFFSET %d", order, pageSizeNum, offset)
-
-		// Выполняем запрос для получения данных студентов
-		rows, err := db.Query(baseQuery, args...)
+		// process main query
+		students, err := QueryToObjects[StudentDetailed](db, baseQuery, reflect.TypeOf(StudentDetailed{}))
 		if err != nil {
-			log.Printf("Error executing query: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch students" + baseQuery})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		defer rows.Close()
 
-		// Чтение данных
-		var students []StudentDetailed
-		for rows.Next() {
-			var s StudentDetailed
-			if err := rows.Scan(&s.ID, &s.FirstName, &s.LastName, &s.Patronomyc); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse student data"})
-				return
-			}
-			students = append(students, s)
-		}
-
-		// Обсчет числа страниц
+		// count pages
 		var count int
-		err = db.QueryRow(countQuery, args...).Scan(&count)
+		err = db.QueryRow(countQuery).Scan(&count)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -111,7 +101,6 @@ func GetStudentsPage(db *sql.DB) gin.HandlerFunc {
 			totalPages++
 		}
 
-		// Формируем и возвращаем ответ
 		response := gin.H{
 			"page_num":    pageNum,
 			"page_size":   pageSizeNum,
@@ -171,24 +160,13 @@ func GetStudentCard(db *sql.DB) gin.HandlerFunc {
 		}
 
 		// find qualification works
-		rows, err := db.Query("SELECT work_id, p.surname || ' ' ||  p.name || ' ' ||  p.patronymic,  q.name, q.work_type, q.work_status, q.grade\n"+
+		query := fmt.Sprintf("SELECT work_id, p.surname || ' ' ||  p.name || ' ' ||  p.patronymic,  q.name, q.work_type, q.work_status, q.grade\n"+
 			"FROM qualification_work as q JOIN professor as p ON p.professor_id = q.supervisor_id\n"+
-			"WHERE q.student_card_id = $1 LIMIT 1", id)
+			"WHERE q.student_card_id = %d", id)
+		qualification_works, err := QueryToObjects[QualificationWork](db, query, reflect.TypeOf(QualificationWork{}))
 		if err != nil {
-			log.Printf("Error executing query: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch qualifiaction works"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
-		}
-		defer rows.Close()
-		var qualification_works []QualificationWork
-		for rows.Next() {
-			var q QualificationWork
-			if err := rows.Scan(&q.ID, &q.Supervisor, &q.Name, &q.WorkType, &q.WorkStatus, &q.Grade); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse qualification work data"})
-				return
-			}
-			qualification_works = append(qualification_works, q)
 		}
 
 		response := gin.H{
@@ -259,20 +237,15 @@ func UpdateStudent(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		// check if there is a student
-		studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
-		var count int
-		err = db.QueryRow(studentQuery, id).Scan(&count)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Student doesnt exist or archived"})
+		if !checkStudentActive(db, id) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Student doesnt exists or archived"})
 			return
 		}
 
-		updateQuery := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
-
-		_, err = db.Exec(updateQuery, id)
+		query := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
+		_, err = db.Exec(query, id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error trying while trying update student"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Error while trying update student, %v", err)})
 			return
 		}
 
@@ -305,20 +278,15 @@ func ArchiveStudent(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		// check if there is a student
-		studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
-		var count int
-		err = db.QueryRow(studentQuery, id).Scan(&count)
-		if count == 0 || err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "student archived or not exists"})
+		if !checkStudentActive(db, id) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Student doesnt exists or archived"})
 			return
 		}
 
-		updateQuery := "UPDATE student SET archived = true WHERE student_card_id = $1"
-
-		_, err = db.Exec(updateQuery, id)
+		query := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
+		_, err = db.Exec(query, id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error trying while trying update student"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error while trying update student, %v", err)})
 			return
 		}
 
@@ -351,11 +319,16 @@ func DeleteStudent(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		updateQuery := "DELETE student WHERE student_card_id = $1"
+		if !checkStudentActive(db, id) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Student doesnt exists or archived"})
+			return
+		}
 
-		_, err = db.Exec(updateQuery, id)
+		query := "DELETE student WHERE student_card_id = $1"
+
+		_, err = db.Exec(query, id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error trying while trying update student"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while trying delete student"})
 			return
 		}
 
@@ -386,29 +359,16 @@ func AddQualifiactionWork(db *sql.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} ProfessorList
-// @Failure 404 {object} ErrorResponse
-// @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /professors [get]
 func GetProfessors(db *sql.DB) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		rows, err := db.Query("SELECT surname || ' ' || name || ' ' || patronymic, professor_id, department_id FROM professor")
+		query := "SELECT surname || ' ' || name || ' ' || patronymic, professor_id, department_id FROM professor"
+		professors, err := QueryToObjects[Professor](db, query, reflect.TypeOf(Professor{}))
 		if err != nil {
-			log.Printf("Error executing query: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch professors"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
-		}
-		defer rows.Close()
-		var professors []Professor
-		for rows.Next() {
-			var p Professor
-			if err := rows.Scan(&p.FullName, &p.ID, &p.DepartmentId); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse professor data"})
-				return
-			}
-			professors = append(professors, p)
 		}
 
 		response := gin.H{
