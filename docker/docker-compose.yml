@@ -1,0 +1,31 @@
+services:
+  my-go-app:
+    container_name: my-go-app-container
+    build:
+      context: ../  # Adjust this path to your backend Dockerfile
+      dockerfile: ./docker/Dockerfile.backend
+    ports:
+      - "8080:8080"  # Map port 8080 on the host to port 8080 in the container
+    environment:
+      - DB_HOST=my-postgres-container
+      - DB_PORT=5432
+      - DB_NAME=students_registry
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
+    volumes:
+      - ./backend:/app  # Mount the backend directory for live updates (optional)
+
+  postgres:
+    container_name: my-postgres-container
+    image: postgres:14.5
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=students_registry
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

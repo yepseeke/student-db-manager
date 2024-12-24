@@ -171,19 +171,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -216,19 +216,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -248,25 +248,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.DepartmentList"
+                            "$ref": "#/definitions/handlers.DepartmentList"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -286,25 +286,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.FacultyList"
+                            "$ref": "#/definitions/handlers.FacultyList"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -324,25 +324,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.ProfessorList"
+                            "$ref": "#/definitions/handlers.ProfessorList"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -372,25 +372,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.StudentCard"
+                            "$ref": "#/definitions/handlers.StudentCard"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -456,25 +456,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.StudentPage"
+                            "$ref": "#/definitions/handlers.StudentPage"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ErrorResponse"
+                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     }
                 }
@@ -545,7 +545,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.Department": {
+        "handlers.Department": {
             "type": "object",
             "properties": {
                 "faculty_id": {
@@ -562,18 +562,18 @@ const docTemplate = `{
                 }
             }
         },
-        "main.DepartmentList": {
+        "handlers.DepartmentList": {
             "type": "object",
             "properties": {
                 "departments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.Department"
+                        "$ref": "#/definitions/handlers.Department"
                     }
                 }
             }
         },
-        "main.ErrorResponse": {
+        "handlers.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -582,7 +582,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.Faculty": {
+        "handlers.Faculty": {
             "type": "object",
             "properties": {
                 "id": {
@@ -593,18 +593,18 @@ const docTemplate = `{
                 }
             }
         },
-        "main.FacultyList": {
+        "handlers.FacultyList": {
             "type": "object",
             "properties": {
                 "faculties": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.Faculty"
+                        "$ref": "#/definitions/handlers.Faculty"
                     }
                 }
             }
         },
-        "main.Professor": {
+        "handlers.Professor": {
             "type": "object",
             "properties": {
                 "department_id": {
@@ -618,18 +618,18 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ProfessorList": {
+        "handlers.ProfessorList": {
             "type": "object",
             "properties": {
                 "professors": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.Professor"
+                        "$ref": "#/definitions/handlers.Professor"
                     }
                 }
             }
         },
-        "main.QualificationWork": {
+        "handlers.QualificationWork": {
             "type": "object",
             "properties": {
                 "grade": {
@@ -652,7 +652,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.Student": {
+        "handlers.Student": {
             "type": "object",
             "properties": {
                 "first_name": {
@@ -669,21 +669,21 @@ const docTemplate = `{
                 }
             }
         },
-        "main.StudentCard": {
+        "handlers.StudentCard": {
             "type": "object",
             "properties": {
                 "qualification_works": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.QualificationWork"
+                        "$ref": "#/definitions/handlers.QualificationWork"
                     }
                 },
                 "student": {
-                    "$ref": "#/definitions/main.StudentDetailed"
+                    "$ref": "#/definitions/handlers.StudentDetailed"
                 }
             }
         },
-        "main.StudentDetailed": {
+        "handlers.StudentDetailed": {
             "type": "object",
             "properties": {
                 "archived": {
@@ -718,7 +718,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.StudentPage": {
+        "handlers.StudentPage": {
             "type": "object",
             "properties": {
                 "page_num": {
@@ -730,7 +730,7 @@ const docTemplate = `{
                 "students": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/main.Student"
+                        "$ref": "#/definitions/handlers.Student"
                     }
                 },
                 "total_pages": {

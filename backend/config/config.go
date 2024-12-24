@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-var HOST, PORT, PROXY, USER, PASSWORD string
+var HOST, PORT, PROXY, DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT string
 
 func getEnvWithDefaultLookup(key, defaultValue string) string {
 	value, ok := os.LookupEnv(key)
@@ -18,8 +18,11 @@ func init() {
 	HOST = getEnvWithDefaultLookup("STDB_HOST", "0.0.0.0")
 	PORT = getEnvWithDefaultLookup("STDB_PORT", "8080")
 	PROXY = getEnvWithDefaultLookup("STDB_PROXY", "127.0.0.1")
-	USER = getEnvWithDefaultLookup("STDB_USER", "postgres")
-	PASSWORD = getEnvWithDefaultLookup("STDB_PASSWORD", "admin")
+	DB_NAME = getEnvWithDefaultLookup("DB_NAME", "students_registry")
+	DB_HOST = getEnvWithDefaultLookup("DB_HOST", "localhost")
+	DB_PORT = getEnvWithDefaultLookup("DB_PORT", "5434")
+	DB_USER = getEnvWithDefaultLookup("DB_USER", "postgres")
+	DB_PASSWORD = getEnvWithDefaultLookup("DB_PASSWORD", "admin")
 }
 
 func GetHostAndPort() string {
@@ -27,11 +30,23 @@ func GetHostAndPort() string {
 }
 
 func GetUser() string {
-	return USER
+	return DB_USER
 }
 
 func GetPassword() string {
-	return PASSWORD
+	return DB_PASSWORD
+}
+
+func GetDbName() string {
+	return DB_NAME
+}
+
+func GetDbHost() string {
+	return DB_HOST
+}
+
+func GetDbPort() string {
+	return DB_PORT
 }
 
 func GetProxy() string {

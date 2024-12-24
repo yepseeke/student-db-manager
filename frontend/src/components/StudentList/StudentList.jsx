@@ -40,6 +40,15 @@ const mockStudents = [
         Group: 'ЮР-11МО',
         Department_ID: 'Правоведение',
     },
+    {
+        id: 5,
+        FirstName: 'Александр',
+        LastName: 'Григорьев',
+        Patronomyc: 'Викторович',
+        Faculty: 'математический',
+        Group: 'ЮР-11МО',
+        Department_ID: 'Правоведение',
+    },
 ];
 
 function StudentList({ filters }) {

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import './Filters.css';
 
 function FilterGroup({ label, options, selectedValues, onChange, withSearch }) {
     const [searchTerm, setSearchTerm] = useState('');
