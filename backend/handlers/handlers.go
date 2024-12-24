@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -423,34 +424,20 @@ func GetProfessors(db *sql.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} FacultyList
-// @Failure 404 {object} ErrorResponse
-// @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /faculties [get]
 func GetFaculties(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rows, err := db.Query("SELECT faculty_id, name FROM faculty")
+		query := "SELECT faculty_id, name FROM faculty"
+		faculties, err := QueryToObjects[Faculty](db, query, reflect.TypeOf(Faculty{}))
 		if err != nil {
-			log.Printf("Error executing query: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch faculties"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
-		}
-		defer rows.Close()
-		var faculties []Faculty
-		for rows.Next() {
-			var f Faculty
-			if err := rows.Scan(&f.ID, &f.Name); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse faculty data"})
-				return
-			}
-			faculties = append(faculties, f)
 		}
 
 		response := gin.H{
 			"faculties": faculties,
 		}
-
 		c.JSON(http.StatusOK, response)
 	}
 }
@@ -460,34 +447,21 @@ func GetFaculties(db *sql.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} DepartmentList
-// @Failure 404 {object} ErrorResponse
-// @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /departments [get]
 func GetDepartments(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rows, err := db.Query("SELECT d.department_id, d.faculty_id, d.name, p.surname || ' ' || p.name || ' ' || p.patronymic FROM department AS d JOIN professor AS p ON d.department_head_id = p.professor_id")
+		query := "SELECT d.department_id, d.name, d.faculty_id, p.surname || ' ' || p.name || ' ' ||\n" +
+			"p.patronymic FROM department AS d JOIN professor AS p ON d.department_head_id = p.professor_id"
+		departments, err := QueryToObjects[Department](db, query, reflect.TypeOf(Department{}))
 		if err != nil {
-			log.Printf("Error executing query: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch departments"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
-		}
-		defer rows.Close()
-		var departments []Department
-		for rows.Next() {
-			var d Department
-			if err := rows.Scan(&d.ID, &d.FacultyId, &d.Name, &d.HeadName); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse department data"})
-				return
-			}
-			departments = append(departments, d)
 		}
 
 		response := gin.H{
 			"departments": departments,
 		}
-
 		c.JSON(http.StatusOK, response)
 	}
 }

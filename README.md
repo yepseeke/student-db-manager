@@ -28,3 +28,20 @@ go run main.go
 | DB_PORT      | Адрес порта базы данных  | 5434 |
 | DB_USER      | Пользователь базы данных  | postgres |
 | DB_PASSWORD  | Пароль базы данных  | admin |
+
+### Done list
+
+- [ ] /students_page
+- [ ] /add_student
+- [ ] /student_card
+- [ ] /update_student
+- [ ] /archive_student
+- [ ] /delete_student
+- [ ] /add_qualification_work
+- [ ] /professors
+- [x] /faculties
+- [x] /departments
+
+### TODO
+
+- Уровень логирования + logrus

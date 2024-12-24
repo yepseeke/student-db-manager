@@ -20,7 +20,7 @@ func init() {
 	PROXY = getEnvWithDefaultLookup("STDB_PROXY", "127.0.0.1")
 	DB_NAME = getEnvWithDefaultLookup("DB_NAME", "students_registry")
 	DB_HOST = getEnvWithDefaultLookup("DB_HOST", "localhost")
-	DB_PORT = getEnvWithDefaultLookup("DB_PORT", "5434")
+	DB_PORT = getEnvWithDefaultLookup("DB_PORT", "5432")
 	DB_USER = getEnvWithDefaultLookup("DB_USER", "postgres")
 	DB_PASSWORD = getEnvWithDefaultLookup("DB_PASSWORD", "admin")
 }
