@@ -11,43 +11,41 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// пиздец запрос, как можно так наговнокдить было
 func generatePageQueries(departmentId string, facultyId string, course string,
 	pageNum int, pageSizeNum int, order string) (string, string) {
 
-	baseQuery := `
-		SELECT student_card_id, "name", surname, patronymic 
-		FROM student
-		WHERE 1 = 1`
+	addterm := ""
+	if facultyId != "" {
+		addterm = " JOIN department AS d ON d.department_id = s.department_id "
+	}
 
-	countQuery := `
-		SELECT COUNT(*)
-		FROM student
-		WHERE 1 = 1`
+	baseQuery := fmt.Sprintf("SELECT s.student_card_id, s.name, s.surname, s.patronymic FROM student AS s %s WHERE 1 = 1", addterm)
+
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM student AS s %s WHERE 1 = 1", addterm)
 
 	// Условия фильтрации
 	if departmentId != "" {
-		baseQuery += fmt.Sprintf(" AND department_id = $%s", departmentId)
-		countQuery += fmt.Sprintf(" AND department_id = $%s", departmentId)
+		baseQuery += fmt.Sprintf(" AND s.department_id = %s", departmentId)
+		countQuery += fmt.Sprintf(" AND s.department_id = %s", departmentId)
 	}
 	if facultyId != "" {
-		baseQuery += fmt.Sprintf(" AND faculty_id = $%s", facultyId)
-		countQuery += fmt.Sprintf(" AND faculty_id = $%s", facultyId)
+		baseQuery += fmt.Sprintf(" AND d.faculty_id = %s", facultyId)
+		countQuery += fmt.Sprintf(" AND d.faculty_id = %s", facultyId)
 	}
 	if course != "" {
-		baseQuery += fmt.Sprintf(` AND course_id = $%s`, course)
-		countQuery += fmt.Sprintf(` AND course_id = $%s`, course)
+		baseQuery += fmt.Sprintf(` AND s.course_id = %s`, course)
+		countQuery += fmt.Sprintf(` AND s.course_id = %s`, course)
 	}
 
 	// pagination
 	offset := (pageNum - 1) * pageSizeNum
-	baseQuery += fmt.Sprintf(" ORDER BY surname %s LIMIT %d OFFSET %d", order, pageSizeNum, offset)
+	baseQuery += fmt.Sprintf(" ORDER BY s.surname %s LIMIT %d OFFSET %d", order, pageSizeNum, offset)
 
 	return baseQuery, countQuery
 }
 
 func checkStudentActive(db *sql.DB, id int) bool {
-	studentQuery := "SELECT COUNT(*) FROM student WHERE student_card_id = $1 AND archived = False"
+	studentQuery := fmt.Sprintf("SELECT COUNT(*) FROM student WHERE student_card_id = %d AND archived = False", id)
 	var count int
 	err := db.QueryRow(studentQuery, id).Scan(&count)
 	return err != nil

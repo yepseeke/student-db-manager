@@ -14,7 +14,7 @@ func QueryToObjects[T any](db *sql.DB, query string, destType reflect.Type) ([]T
 	// Process query
 	rows, err := db.Query(query)
 	if err != nil {
-		msg := fmt.Sprintf("Error executing query: %v", err)
+		msg := fmt.Sprintf("Error executing query: %s", query)
 		log.Printf(msg)
 		return objects, errors.New(msg)
 	}
