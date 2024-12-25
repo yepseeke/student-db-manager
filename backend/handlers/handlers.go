@@ -7,34 +7,30 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func generatePageQueries(departmentId string, facultyId string, course string,
+func generatePageQueries(departmentIds []string, facultyIds []string, courses []string,
 	pageNum int, pageSizeNum int, order string) (string, string) {
 
-	addterm := ""
-	if facultyId != "" {
-		addterm = " JOIN department AS d ON d.department_id = s.department_id "
-	}
+	baseQuery := "SELECT s.student_card_id, s.name, s.surname, s.patronymic, f.name, c.name || '-' || s.year || s.group, c.education_level FROM student AS s JOIN course AS c ON c.course_id = s.course_id JOIN department AS d ON d.department_id = s.department_id JOIN faculty AS f ON f.faculty_id = d.faculty_id WHERE 1 = 1"
 
-	baseQuery := fmt.Sprintf("SELECT s.student_card_id, s.name, s.surname, s.patronymic FROM student AS s %s WHERE 1 = 1", addterm)
-
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM student AS s %s WHERE 1 = 1", addterm)
+	countQuery := "SELECT COUNT(*) FROM student AS s JOIN course AS c ON c.course_id = s.course_id JOIN department AS d ON d.department_id = s.department_id JOIN faculty AS f ON f.faculty_id = d.faculty_id WHERE 1 = 1"
 
 	// Условия фильтрации
-	if departmentId != "" {
-		baseQuery += fmt.Sprintf(" AND s.department_id = %s", departmentId)
-		countQuery += fmt.Sprintf(" AND s.department_id = %s", departmentId)
+	if len(departmentIds) != 0 {
+		baseQuery += " AND s.department_id IN " + "( " + strings.Join(departmentIds, ", ") + " )"
+		countQuery += " AND s.department_id IN " + "( " + strings.Join(departmentIds, ", ") + " )"
 	}
-	if facultyId != "" {
-		baseQuery += fmt.Sprintf(" AND d.faculty_id = %s", facultyId)
-		countQuery += fmt.Sprintf(" AND d.faculty_id = %s", facultyId)
+	if len(facultyIds) != 0 {
+		baseQuery += " AND d.faculty_id IN " + "( " + strings.Join(facultyIds, ", ") + " )"
+		countQuery += " AND d.faculty_id IN " + "( " + strings.Join(facultyIds, ", ") + " )"
 	}
-	if course != "" {
-		baseQuery += fmt.Sprintf(` AND s.course_id = %s`, course)
-		countQuery += fmt.Sprintf(` AND s.course_id = %s`, course)
+	if len(courses) != 0 {
+		baseQuery += " AND s.course_id IN " + "( " + strings.Join(courses, ", ") + " )"
+		countQuery += " AND s.course_id IN " + "( " + strings.Join(courses, ", ") + " )"
 	}
 
 	// pagination
@@ -57,9 +53,9 @@ func checkStudentActive(db *sql.DB, id int) bool {
 // @Produce json
 // @Param page query int false "Номер страницы" default(1)
 // @Param pageSize query int false "Число студентов на странице" default(20)
-// @Param depatmentId query int false "Фильтрация по ID кафедры"
-// @Param facultyId query int false "Фильтрация по ID факультета"
-// @Param course query int false "Фильтрация по номеру курса"
+// @Param depatmentId query []int false "Фильтрация по ID кафедры"
+// @Param facultyIds query []int false "Фильтрация по ID факультета"
+// @Param course query []int false "Фильтрация по номеру курса"
 // @Param order query SortOrder true "Порядок сортировки" default("ASC")
 // @Success 200 {object} StudentPage
 // @Failure 404 {object} ErrorResponse
@@ -70,19 +66,19 @@ func GetStudentsPage(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		page := c.DefaultQuery("page", "")
 		pageSize := c.DefaultQuery("pageSize", "")
-		departmentId := c.DefaultQuery("departmentId", "")
-		facultyId := c.DefaultQuery("facultyId", "")
-		course := c.DefaultQuery("course", "")
+		departmentIds := c.QueryArray("departmentIds")
+		facultyIds := c.QueryArray("facultyIds")
+		courses := c.QueryArray("courses")
 		order := c.DefaultQuery("order", "ASC")
 
 		pageNum, pageSizeNum := 1, 20
 		fmt.Sscanf(page, "%d", &pageNum)
 		fmt.Sscanf(pageSize, "%d", &pageSizeNum)
 
-		baseQuery, countQuery := generatePageQueries(departmentId, facultyId, course, pageNum, pageSizeNum, order)
+		baseQuery, countQuery := generatePageQueries(departmentIds, facultyIds, courses, pageNum, pageSizeNum, order)
 
 		// process main query
-		students, err := QueryToObjects[StudentDetailed](db, baseQuery, reflect.TypeOf(StudentDetailed{}))
+		students, err := QueryToObjects[Student](db, baseQuery, reflect.TypeOf(Student{}))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

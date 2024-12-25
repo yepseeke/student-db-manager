@@ -251,18 +251,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/handlers.DepartmentList"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -289,18 +277,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/handlers.FacultyList"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -325,18 +301,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handlers.ProfessorList"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
                         }
                     },
                     "500": {
@@ -422,19 +386,31 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Фильтрация по ID кафедры",
                         "name": "depatmentId",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Фильтрация по ID факультета",
-                        "name": "facultyId",
+                        "name": "facultyIds",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Фильтрация по номеру курса",
                         "name": "course",
                         "in": "query"
@@ -655,7 +631,16 @@ const docTemplate = `{
         "handlers.Student": {
             "type": "object",
             "properties": {
+                "education_level": {
+                    "type": "string"
+                },
+                "faculty_name": {
+                    "type": "string"
+                },
                 "first_name": {
+                    "type": "string"
+                },
+                "group_name": {
                     "type": "string"
                 },
                 "id": {

@@ -6,22 +6,30 @@ type WorkType string
 
 type WorkStatus string
 
+type EducationLevel string
+
 const (
-	Asc          SortOrder  = "ASC"
-	Desc         SortOrder  = "DESC"
-	Course       WorkType   = "course"
-	Diploma      WorkType   = "diploma"
-	Master       WorkType   = "master"
-	Dissertation WorkType   = "dissertation"
-	Complete     WorkStatus = "complete"
-	InProgress   WorkStatus = "in progress"
+	Asc          SortOrder      = "ASC"
+	Desc         SortOrder      = "DESC"
+	CourseWork   WorkType       = "course"
+	DiplomaWork  WorkType       = "diploma"
+	MasterWork   WorkType       = "master"
+	Dissertation WorkType       = "dissertation"
+	Complete     WorkStatus     = "complete"
+	InProgress   WorkStatus     = "in progress"
+	Bachelor     EducationLevel = "bachelor"
+	Master       EducationLevel = "master"
+	PostGraduate EducationLevel = "postgraduate"
 )
 
 type Student struct {
-	ID         int    `json:"id"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	Patronomyc string `json:"patronomyc"`
+	ID             int            `json:"id"`
+	FirstName      string         `json:"first_name"`
+	LastName       string         `json:"last_name"`
+	Patronomyc     string         `json:"patronomyc"`
+	FacultyName    string         `json:"faculty_name"`
+	GroupName      string         `json:"group_name"`
+	EducationLevel EducationLevel `json:"education_level"`
 }
 
 type StudentDetailed struct {
@@ -50,12 +58,12 @@ type StudentCard struct {
 }
 
 type QualificationWork struct {
-	ID         int    `json:"id"`
-	Supervisor string `json:"supervisor"`
-	Name       string `json:"name"`
-	WorkType   string `json:"work_type"`
-	WorkStatus string `json:"work_status"`
-	Grade      *int   `json:"grade"`
+	ID         int        `json:"id"`
+	Supervisor string     `json:"supervisor"`
+	Name       string     `json:"name"`
+	WorkType   WorkType   `json:"work_type"`
+	WorkStatus WorkStatus `json:"work_status"`
+	Grade      *int       `json:"grade"`
 }
 
 type Professor struct {

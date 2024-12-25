@@ -70,7 +70,13 @@ definitions:
     type: object
   handlers.Student:
     properties:
+      education_level:
+        type: string
+      faculty_name:
+        type: string
       first_name:
+        type: string
+      group_name:
         type: string
       id:
         type: integer
@@ -289,14 +295,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.DepartmentList'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -314,14 +312,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.FacultyList'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -339,14 +329,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.ProfessorList'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -400,18 +382,27 @@ paths:
         in: query
         name: pageSize
         type: integer
-      - description: Фильтрация по ID кафедры
+      - collectionFormat: csv
+        description: Фильтрация по ID кафедры
         in: query
+        items:
+          type: integer
         name: depatmentId
-        type: integer
-      - description: Фильтрация по ID факультета
+        type: array
+      - collectionFormat: csv
+        description: Фильтрация по ID факультета
         in: query
-        name: facultyId
-        type: integer
-      - description: Фильтрация по номеру курса
+        items:
+          type: integer
+        name: facultyIds
+        type: array
+      - collectionFormat: csv
+        description: Фильтрация по номеру курса
         in: query
+        items:
+          type: integer
         name: course
-        type: integer
+        type: array
       - default: '"ASC"'
         description: Порядок сортировки
         enum:
