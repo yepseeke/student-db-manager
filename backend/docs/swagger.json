@@ -58,7 +58,8 @@
                         "type": "string",
                         "description": "Статус работы",
                         "name": "work_status",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "integer",
@@ -70,6 +71,12 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -460,9 +467,21 @@
                     {
                         "type": "string",
                         "description": "ID студента",
-                        "name": "id",
+                        "name": "student_id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID кафедры",
+                        "name": "department_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID факультета",
+                        "name": "faculty_id",
+                        "in": "query"
                     },
                     {
                         "type": "string",
@@ -480,6 +499,18 @@
                         "type": "string",
                         "description": "Отчество",
                         "name": "patronymic",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Год обучения",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Номер группы",
+                        "name": "group",
                         "in": "query"
                     },
                     {
@@ -505,6 +536,12 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -538,6 +575,19 @@
                     }
                 }
             }
+        },
+        "handlers.EducationLevel": {
+            "type": "string",
+            "enum": [
+                "bachelor",
+                "master",
+                "postgraduate"
+            ],
+            "x-enum-varnames": [
+                "Bachelor",
+                "Master",
+                "PostGraduate"
+            ]
         },
         "handlers.ErrorResponse": {
             "type": "object",
@@ -611,10 +661,10 @@
                     "type": "string"
                 },
                 "work_status": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.WorkStatus"
                 },
                 "work_type": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.WorkType"
                 }
             }
         },
@@ -622,7 +672,7 @@
             "type": "object",
             "properties": {
                 "education_level": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.EducationLevel"
                 },
                 "faculty_name": {
                     "type": "string"
@@ -712,6 +762,32 @@
                     "type": "integer"
                 }
             }
+        },
+        "handlers.WorkStatus": {
+            "type": "string",
+            "enum": [
+                "complete",
+                "in progress"
+            ],
+            "x-enum-varnames": [
+                "Complete",
+                "InProgress"
+            ]
+        },
+        "handlers.WorkType": {
+            "type": "string",
+            "enum": [
+                "course",
+                "diploma",
+                "master",
+                "dissertation"
+            ],
+            "x-enum-varnames": [
+                "CourseWork",
+                "DiplomaWork",
+                "MasterWork",
+                "Dissertation"
+            ]
         }
     }
 }

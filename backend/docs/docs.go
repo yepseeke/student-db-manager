@@ -68,7 +68,8 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Статус работы",
                         "name": "work_status",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "integer",
@@ -80,6 +81,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -470,9 +477,21 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "ID студента",
-                        "name": "id",
+                        "name": "student_id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID кафедры",
+                        "name": "department_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID факультета",
+                        "name": "faculty_id",
+                        "in": "query"
                     },
                     {
                         "type": "string",
@@ -490,6 +509,18 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Отчество",
                         "name": "patronymic",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Год обучения",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Номер группы",
+                        "name": "group",
                         "in": "query"
                     },
                     {
@@ -515,6 +546,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -548,6 +585,19 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "handlers.EducationLevel": {
+            "type": "string",
+            "enum": [
+                "bachelor",
+                "master",
+                "postgraduate"
+            ],
+            "x-enum-varnames": [
+                "Bachelor",
+                "Master",
+                "PostGraduate"
+            ]
         },
         "handlers.ErrorResponse": {
             "type": "object",
@@ -621,10 +671,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "work_status": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.WorkStatus"
                 },
                 "work_type": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.WorkType"
                 }
             }
         },
@@ -632,7 +682,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "education_level": {
-                    "type": "string"
+                    "$ref": "#/definitions/handlers.EducationLevel"
                 },
                 "faculty_name": {
                     "type": "string"
@@ -722,6 +772,32 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "handlers.WorkStatus": {
+            "type": "string",
+            "enum": [
+                "complete",
+                "in progress"
+            ],
+            "x-enum-varnames": [
+                "Complete",
+                "InProgress"
+            ]
+        },
+        "handlers.WorkType": {
+            "type": "string",
+            "enum": [
+                "course",
+                "diploma",
+                "master",
+                "dissertation"
+            ],
+            "x-enum-varnames": [
+                "CourseWork",
+                "DiplomaWork",
+                "MasterWork",
+                "Dissertation"
+            ]
         }
     }
 }`

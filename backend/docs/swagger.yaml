@@ -17,6 +17,16 @@ definitions:
           $ref: '#/definitions/handlers.Department'
         type: array
     type: object
+  handlers.EducationLevel:
+    enum:
+    - bachelor
+    - master
+    - postgraduate
+    type: string
+    x-enum-varnames:
+    - Bachelor
+    - Master
+    - PostGraduate
   handlers.ErrorResponse:
     properties:
       error:
@@ -64,14 +74,14 @@ definitions:
       supervisor:
         type: string
       work_status:
-        type: string
+        $ref: '#/definitions/handlers.WorkStatus'
       work_type:
-        type: string
+        $ref: '#/definitions/handlers.WorkType'
     type: object
   handlers.Student:
     properties:
       education_level:
-        type: string
+        $ref: '#/definitions/handlers.EducationLevel'
       faculty_name:
         type: string
       first_name:
@@ -130,6 +140,26 @@ definitions:
       total_pages:
         type: integer
     type: object
+  handlers.WorkStatus:
+    enum:
+    - complete
+    - in progress
+    type: string
+    x-enum-varnames:
+    - Complete
+    - InProgress
+  handlers.WorkType:
+    enum:
+    - course
+    - diploma
+    - master
+    - dissertation
+    type: string
+    x-enum-varnames:
+    - CourseWork
+    - DiplomaWork
+    - MasterWork
+    - Dissertation
 info:
   contact: {}
   title: Student DataBase API
@@ -171,6 +201,7 @@ paths:
         - in progress
         in: query
         name: work_status
+        required: true
         type: string
       - description: Оценка
         in: query
@@ -181,6 +212,10 @@ paths:
       responses:
         "200":
           description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Добавление квалификационной работы
   /add_student:
     post:
@@ -440,9 +475,17 @@ paths:
       parameters:
       - description: ID студента
         in: query
-        name: id
+        name: student_id
         required: true
         type: string
+      - description: ID кафедры
+        in: query
+        name: department_id
+        type: integer
+      - description: ID факультета
+        in: query
+        name: faculty_id
+        type: integer
       - description: Имя
         in: query
         name: name
@@ -455,6 +498,14 @@ paths:
         in: query
         name: patronymic
         type: string
+      - description: Год обучения
+        in: query
+        name: year
+        type: integer
+      - description: Номер группы
+        in: query
+        name: group
+        type: integer
       - description: Номер телефона
         in: query
         name: phone_number
@@ -473,5 +524,9 @@ paths:
       responses:
         "200":
           description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
       summary: Обновление студента
 swagger: "2.0"

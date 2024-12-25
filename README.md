@@ -34,10 +34,10 @@ go run main.go
 - [x] /students_page
 - [ ] /add_student
 - [x] /student_card
-- [ ] /update_student
+- [x] /update_student
 - [x] /archive_student
 - [x] /delete_student
-- [ ] /add_qualification_work
+- [x] /add_qualification_work
 - [x] /professors
 - [x] /faculties
 - [x] /departments
@@ -45,5 +45,6 @@ go run main.go
 ### TODO
 
 - Уровень логирования + logrus
-- Нормальная валидация входных данных и убрать говнокод с этим связанный
+- Нормальная валидация входных данных
+- Более аккуратное обращение с бд и отлавливание ошибок (переезд на другую библиотеку)
 - Кривая передача TypeOf в template-функцию (не понимаю как в golang с таким работать)

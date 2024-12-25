@@ -207,39 +207,116 @@ func AddStudent(db *sql.DB) gin.HandlerFunc {
 // @Description Обновление информации о студенте
 // @Accept json
 // @Produce json
-// @Param id query string true "ID студента"
+// @Param student_id query string true "ID студента"
+// @Param department_id query int false "ID кафедры"
+// @Param faculty_id query int false "ID факультета"
 // @Param name query string false "Имя"
 // @Param surname query string false "Фамилия"
 // @Param patronymic query string false "Отчество"
+// @Param year query int false "Год обучения"
+// @Param group query int false "Номер группы"
 // @Param phone_number query string false "Номер телефона"
 // @Param email query string false "Адрес электронной почты"
 // @Param birth_date query string false "Дата рождения" format(date)
 // @Success 200
+// @Failure 500 {object} ErrorResponse
 // @Router /update_student [put]
 func UpdateStudent(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		idStr := c.DefaultQuery("id", "")
+		studentId := c.DefaultQuery("student_id", "")
+		departmentId := c.DefaultQuery("department_id", "")
+		courseId := c.DefaultQuery("course_id", "")
+		surname := c.DefaultQuery("surname", "")
+		name := c.DefaultQuery("name", "")
+		patronymic := c.DefaultQuery("patronymic", "")
+		year := c.DefaultQuery("year", "")
+		group := c.DefaultQuery("group", "")
+		phoneNumber := c.DefaultQuery("phone_number", "")
+		email := c.DefaultQuery("email", "")
+		birthDate := c.DefaultQuery("birth_date", "")
 
-		// Validate id
-		if idStr == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing 'id' query parameter"})
-			return
+		query := "UPDATE student SET "
+
+		if departmentId != "" {
+			query += " department_id = " + departmentId
 		}
-		id, err := strconv.Atoi(idStr)
+
+		if courseId != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " course_id = " + courseId
+		}
+
+		if surname != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " surname = '" + surname + "'"
+		}
+
+		if name != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " name = '" + name + "'"
+		}
+
+		if patronymic != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " patronymic = '" + patronymic + "'"
+		}
+
+		if year != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " year = " + year
+		}
+
+		if group != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " group = " + group
+		}
+
+		if departmentId != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " department_id = " + departmentId
+		}
+
+		if phoneNumber != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " phone_number = '" + phoneNumber + "'"
+		}
+
+		if email != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " email = '" + email + "'"
+		}
+
+		if birthDate != "" {
+			if query[len(query)-1] != ' ' {
+				query += ","
+			}
+			query += " birth_date = '" + birthDate + "'"
+		}
+
+		query += " WHERE student_card_id = " + studentId
+
+		_, err := db.Exec(query)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid 'id' format. Must be an integer."})
-			return
-		}
-
-		if !checkStudentActive(db, id) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Student doesnt exists or archived"})
-			return
-		}
-
-		query := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
-		_, err = db.Exec(query, id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Error while trying update student, %v", err)})
+			log.Fatal(query)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -338,12 +415,38 @@ func DeleteStudent(db *sql.DB) gin.HandlerFunc {
 // @Param supervisor_id query int true "ID профессора"
 // @Param name query string true "Наименование работы"
 // @Param work_type query WorkType true "Тип работы"
-// @Param work_status query WorkStatus false "Статус работы"
+// @Param work_status query WorkStatus true "Статус работы"
 // @Param grade query int false "Оценка"
 // @Success 200
+// @Failure 500 {object} ErrorResponse
 // @Router /add_qualification_work [post]
 func AddQualifiactionWork(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		studentId := c.DefaultQuery("student_id", "")
+		supervisorId := c.DefaultQuery("supervisor_id", "")
+		name := c.DefaultQuery("name", "")
+		work_type := c.DefaultQuery("work_type", "")
+		work_status := c.DefaultQuery("work_status", "")
+		grade := c.DefaultQuery("grade", "")
+
+		query := "INSERT INTO qualification_work (student_card_id, supervisor_id, name, work_type, work_status"
+
+		if grade != "" {
+			query += ", grade) "
+			grade = ", " + grade
+		} else {
+			query += ") "
+		}
+
+		query += fmt.Sprintf(" VALUES (%s, %s, '%s', '%s', '%s'%s)", studentId, supervisorId, name, work_type, work_status, grade)
+
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Fatal(query)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.Status(http.StatusOK)
 	}
 }
