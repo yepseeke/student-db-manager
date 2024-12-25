@@ -188,6 +188,7 @@ SELECT qw.work_id,
        s.name AS student_name, 
        s.patronymic AS student_patronymic,
 	   s.year,
+	   s.group,
 	   c.education_level,
        d.name AS department_name
 FROM qualification_work qw
