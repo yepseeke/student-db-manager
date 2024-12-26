@@ -1,15 +1,22 @@
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
-import './Filters.css';
+import './FilterGroup.css';
 
-function FilterGroup({ label, options, selectedValues, onChange, withSearch }) {
+function FilterGroup({ label, options, selectedValues, onChange, withSearch, registerReset }) {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleOptionClick = (option) => {
-        if (selectedValues.includes(option)) {
-            onChange(selectedValues.filter((item) => item !== option));
+    useEffect(() => {
+        // Регистрируем функцию сброса
+        if (registerReset) {
+            registerReset(() => setSearchTerm(''));
+        }
+    }, [registerReset]);
+
+    const handleOptionClick = (value) => {
+        if (selectedValues.includes(value)) {
+            onChange(selectedValues.filter((item) => item !== value));
         } else {
-            onChange([...selectedValues, option]);
+            onChange([...selectedValues, value]);
         }
     };
 
@@ -18,7 +25,7 @@ function FilterGroup({ label, options, selectedValues, onChange, withSearch }) {
     };
 
     const filteredOptions = options.filter((option) =>
-        option.toLowerCase().includes(searchTerm.toLowerCase())
+        option.label.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -34,13 +41,13 @@ function FilterGroup({ label, options, selectedValues, onChange, withSearch }) {
                 />
             )}
             <div className="options-list">
-                {filteredOptions.map((option, index) => (
+                {filteredOptions.map((option) => (
                     <div
-                        key={index}
-                        className={`option-item ${selectedValues.includes(option) ? 'selected' : ''}`}
-                        onClick={() => handleOptionClick(option)}
+                        key={option.value}
+                        className={`option-item ${selectedValues.includes(option.value) ? 'selected' : ''}`}
+                        onClick={() => handleOptionClick(option.value)}
                     >
-                        {option}
+                        {option.label}
                     </div>
                 ))}
             </div>
@@ -50,14 +57,21 @@ function FilterGroup({ label, options, selectedValues, onChange, withSearch }) {
 
 FilterGroup.propTypes = {
     label: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.string).isRequired,
-    selectedValues: PropTypes.arrayOf(PropTypes.string).isRequired,
+    options: PropTypes.arrayOf(
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            value: PropTypes.number.isRequired,
+        })
+    ).isRequired,
+    selectedValues: PropTypes.arrayOf(PropTypes.number).isRequired,
     onChange: PropTypes.func.isRequired,
     withSearch: PropTypes.bool,
+    registerReset: PropTypes.func, // Новое свойство
 };
 
 FilterGroup.defaultProps = {
     withSearch: false,
+    registerReset: null,
 };
 
 export default FilterGroup;

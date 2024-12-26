@@ -13,3 +13,19 @@
 .main-content {
   display: flex;
 }
+
+button {
+  font-family: inherit;
+  background-color: #ff80b4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #f33283;
+  color: #f9f9f9;
+}

@@ -10,7 +10,7 @@ html, body {
   padding: 0;
   background-color: black;
   color: white;
-  font-family: Alice, sans-serif;
+  font-family: Alice, serif;
 }
 
 @media (max-width: 768px) {

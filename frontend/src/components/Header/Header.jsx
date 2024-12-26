@@ -6,7 +6,7 @@ function Header({ onAddStudentClick }) {
         <header className="header">
             <div className="header-content">
                 <div className="left-section">
-                    <img src="/src/Logo.svg" alt="Logo" className="logo" />
+                    <img src="/src/components/Pictures/Logo.svg" alt="Logo" className="logo" />
                     <h1 className="title">lost mary blue razz</h1>
                 </div>
                 <button className="add-student-button" onClick={onAddStudentClick}>Добавить студента</button>

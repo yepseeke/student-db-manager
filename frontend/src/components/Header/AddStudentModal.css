@@ -48,28 +48,14 @@
 
 .modal-actions button {
     padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
     font-size: 16px;
-    cursor: pointer;
 }
 
 .modal-actions button[type="button"] {
-    font-family: Alice, sans-serif;
     background: gray;
     color: white;
 }
 
 .modal-actions button[type="button"]:hover {
     background: darkgray;
-}
-
-.modal-actions button[type="submit"] {
-    font-family: Alice, sans-serif;
-    background: #ff80b4;
-    color: white;
-}
-
-.modal-actions button[type="submit"]:hover {
-    background: #f33283;
 }
