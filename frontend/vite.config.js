@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [react()],
     server: {
         proxy: {
-            '^/(students_page|faculties|departments|student_card|archive_student|delete_student|add_qualification_work)(\\?.*)?$': {
+            '^/(students_page|faculties|departments|student_card|archive_student|delete_student|add_qualification_work|update_student)(\\?.*)?$': {
                 target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,

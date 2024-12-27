@@ -5,8 +5,8 @@ import WorkList from './WorkList';
 import './StudentDetails.css';
 
 function StudentDetails() {
-    const { id } = useParams(); // Получение ID студента из URL
-    const navigate = useNavigate(); // Для перенаправления после удаления студента
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [studentData, setStudentData] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -27,10 +27,6 @@ function StudentDetails() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchStudentDetails();
-    }, [id]);
 
     const handleArchive = async () => {
         try {
@@ -56,17 +52,71 @@ function StudentDetails() {
                 throw new Error('Failed to delete student');
             }
             alert('Студент успешно удален');
-            navigate('/'); // Перенаправление на список студентов
+            navigate('/');
         } catch (error) {
             console.error('Ошибка при удалении студента:', error);
             alert('Не удалось удалить студента');
         }
     };
 
+    const handleSave = async (updatedStudent) => {
+        try {
+            const params = new URLSearchParams();
+            params.append('student_id', id);
+
+            // Проверка измененных данных
+            if (updatedStudent.department_id) {
+                params.append('department_id', updatedStudent.department_id);
+            }
+            if (updatedStudent.faculty_id) {
+                params.append('faculty_id', updatedStudent.faculty_id);
+            }
+            if (updatedStudent.first_name) {
+                params.append('name', updatedStudent.first_name);
+            }
+            if (updatedStudent.last_name) {
+                params.append('surname', updatedStudent.last_name);
+            }
+            if (updatedStudent.patronomyc) {
+                params.append('patronymic', updatedStudent.patronomyc);
+            }
+            if (updatedStudent.phone) {
+                params.append('phone_number', updatedStudent.phone);
+            }
+            if (updatedStudent.email) {
+                params.append('email', updatedStudent.email);
+            }
+
+            if (Array.from(params.entries()).length <= 1) {
+                alert('Алерт')
+                return;
+            }
+
+            const response = await fetch(`/update_student?${params.toString()}`, {
+                method: 'PUT',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update student');
+            }
+
+            alert('Данные студента успешно обновлены');
+            fetchStudentDetails();
+        } catch (error) {
+            console.error('Ошибка при обновлении данных студента:', error);
+            alert('Не удалось обновить данные студента');
+        }
+    };
+
+
+
     const handleWorkAdded = () => {
-        // Обновление данных после добавления работы
         fetchStudentDetails();
     };
+
+    useEffect(() => {
+        fetchStudentDetails();
+    }, [id]);
 
     if (loading) {
         return <p>Загрузка информации о студенте...</p>;
@@ -80,7 +130,10 @@ function StudentDetails() {
         <div className="student-details">
             <div className="student-details-content">
                 <div className="info">
-                    <StudentInfo student={studentData.student} />
+                    <StudentInfo
+                        student={studentData.student}
+                        onSave={handleSave}
+                    />
                 </div>
                 <div className="avatar">
                     <img
@@ -90,7 +143,6 @@ function StudentDetails() {
                     />
                 </div>
                 <div className="student-actions">
-                    <button className="student-action-button edit-button">Редактировать</button>
                     <button className="student-action-button archive-button" onClick={handleArchive}>
                         Архивировать
                     </button>
