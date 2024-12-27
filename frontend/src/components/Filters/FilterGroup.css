@@ -1,0 +1,50 @@
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffadd7;
+    font-size: 14px;
+}
+
+.options-list {
+    max-height: 167px;
+    overflow-y: auto;
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: black;
+    color: #f9f9f9;
+    padding: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #ff80b4 black;
+}
+
+.option-item {
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.option-item:hover {
+    background-color: #ffadd7;
+    color: white;
+}
+
+.option-item.selected {
+    background-color: #f33283;
+
+}
+
+.search-input {
+    font-family: Alice, serif;
+    width: calc(100% - 10px);
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: black;
+    color: #f9f9f9;
+}

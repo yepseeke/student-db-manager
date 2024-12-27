@@ -4,4 +4,37 @@
     flex-direction: column;
     gap: 20px;
     padding: 20px;
+    color: #ff80b4;
+    font-size: 16px;
+}
+
+.sort-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ff80b4;
+    background-color: transparent;
+}
+
+.sort-button img {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.sort-button:hover {
+    background-color: transparent;
+    color: #ff80b4;
+    transform: none;
+}
+
+.sort-button:active {
+    transform: none;
 }

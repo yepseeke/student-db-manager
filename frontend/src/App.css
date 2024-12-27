@@ -13,3 +13,24 @@
 .main-content {
   display: flex;
 }
+
+button {
+  font-family: inherit;
+  background-color: #ff80b4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #f33283;
+  color: #f9f9f9;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+}

@@ -1,0 +1,27 @@
+.student-details-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f33283;
+    margin-top: 0;
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.student-info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.student-info-label {
+    color: #ffadd7;
+}
+
+.student-info-value {
+    color: #f9f9f9;
+}

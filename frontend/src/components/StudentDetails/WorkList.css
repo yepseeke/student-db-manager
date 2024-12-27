@@ -1,0 +1,78 @@
+.work-list {
+    margin-top: 40px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+}
+
+.work-list-header {
+    font-size: 24px;
+    color: #ff80b4;
+    margin-bottom: 20px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Табличный стиль с использованием flex */
+.work-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.work-table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #f33283;
+    text-align: center;
+}
+
+.work-table-column {
+    flex: 1;
+    text-align: left;
+    padding: 0 10px;
+}
+
+.work-table-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: #ff80b4;
+    gap: 10px;
+}
+
+.work-table-row:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.work-table-cell {
+    flex: 1;
+    text-align: left;
+    padding: 0 10px;
+}
+
+.work-table-empty {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #cccccc;
+}
+
+.add-work-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.add-work-button {
+    padding: 10px 20px;
+}
