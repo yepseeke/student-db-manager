@@ -36,6 +36,7 @@ function StudentDetails() {
             if (!response.ok) {
                 throw new Error('Failed to archive student');
             }
+            fetchStudentDetails();
             alert('Студент успешно архивирован');
         } catch (error) {
             console.error('Ошибка при архивировании студента:', error);
@@ -87,11 +88,6 @@ function StudentDetails() {
                 params.append('email', updatedStudent.email);
             }
 
-            if (Array.from(params.entries()).length <= 1) {
-                alert('Алерт')
-                return;
-            }
-
             const response = await fetch(`/update_student?${params.toString()}`, {
                 method: 'PUT',
             });
@@ -128,6 +124,11 @@ function StudentDetails() {
 
     return (
         <div className="student-details">
+            {studentData.student.archived && (
+                <div className="archived-message">
+                    <p>Этот студент находится в архиве.</p>
+                </div>
+            )}
             <div className="student-details-content">
                 <div className="info">
                     <StudentInfo
@@ -142,7 +143,9 @@ function StudentDetails() {
                         className="student-avatar"
                     />
                 </div>
-                <div className="student-actions">
+                <div
+                    className="student-actions"
+                >
                     <button className="student-action-button archive-button" onClick={handleArchive}>
                         Архивировать
                     </button>
