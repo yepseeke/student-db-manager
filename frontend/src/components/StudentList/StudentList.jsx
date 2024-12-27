@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import StudentCard from './StudentCard';
 import Pagination from '../Pagination/Pagination.jsx';
+import CustomPageSizeSelect from '../CustomPageSizeSelect/CustomPageSizeSelect.jsx';
 import './StudentList.css';
 
 function StudentList({ filters }) {
@@ -10,13 +11,15 @@ function StudentList({ filters }) {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [sortOrder, setSortOrder] = useState('ASC');
+    const [pageSize, setPageSize] = useState(10); // Количество студентов на странице
 
-    const fetchStudents = async (page, filters, order) => {
+    const fetchStudents = async (page, filters, order, pageSize) => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
             params.append('page', page);
             params.append('order', order);
+            params.append('pageSize', pageSize);
             if (filters.selectedFaculties?.length) {
                 params.append('facultyIds', filters.selectedFaculties.join(','));
             }
@@ -39,7 +42,7 @@ function StudentList({ filters }) {
     };
 
     const handleFetchStudents = async () => {
-        await fetchStudents(currentPage, filters, sortOrder);
+        await fetchStudents(currentPage, filters, sortOrder, pageSize);
         scrollToTop();
     };
 
@@ -56,12 +59,12 @@ function StudentList({ filters }) {
             }
         };
         fetchWithReset();
-    }, [filters, sortOrder]);
+    }, [filters, sortOrder, pageSize]);
 
     const scrollToTop = () => {
         window.scrollTo({
             top: 0,
-            behavior: 'instant',
+            behavior: 'smooth',
         });
     };
 
@@ -71,6 +74,10 @@ function StudentList({ filters }) {
 
     const toggleSortOrder = () => {
         setSortOrder((prevOrder) => (prevOrder === 'ASC' ? 'DESC' : 'ASC'));
+    };
+
+    const handlePageSizeChange = (page_size) => {
+        setPageSize(page_size);
     };
 
     return (
@@ -86,18 +93,23 @@ function StudentList({ filters }) {
                     />
                     По алфавиту
                 </button>
+                <CustomPageSizeSelect pageSize={pageSize} onChange={handlePageSizeChange} />
             </div>
             {loading ? (
                 <p>Загрузка информации о студентах...</p>
             ) : students.length > 0 ? (
                 students.map((student) => (
-                    <StudentCard key={student.id} student={student} />
+                    <StudentCard key={student.id} student={student}/>
                 ))
             ) : (
                 <p>Информация о студентах с выбранными параметрами отсутствует.</p>
             )}
             {students.length > 0 && !loading && (
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
             )}
         </div>
     );

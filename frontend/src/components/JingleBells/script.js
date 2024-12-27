@@ -175,7 +175,6 @@
 
 	document.addEventListener('keydown', function(j){
 		var i = j.target;
-		console.log(j.keyCode)
 		if (j.which in a) {
 			var index = parseInt(a[j.which]);
 			balls = new Balls(context, buffer.getSound(index));

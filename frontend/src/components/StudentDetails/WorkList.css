@@ -1,54 +1,78 @@
 .work-list {
-    margin-top: 20px;
-    width: 100%;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    margin-top: 40px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
 }
 
 .work-list-header {
-    background-color: #4caf50;
-    color: white;
-    padding: 10px 20px;
-    font-size: 18px;
+    font-size: 24px;
+    color: #ff80b4;
+    margin-bottom: 20px;
+    text-align: left;
     font-weight: bold;
 }
 
-.work-item {
+/* Табличный стиль с использованием flex */
+.work-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.work-table-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.3s ease;
-}
-
-.work-item:hover {
+    padding: 15px;
     background-color: #f9f9f9;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #f33283;
+    text-align: center;
 }
 
-.work-item:last-child {
-    border-bottom: none;
-}
-
-.work-item-info {
+.work-table-column {
     flex: 1;
+    text-align: left;
+    padding: 0 10px;
 }
 
-.work-item-title {
+.work-table-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: #ff80b4;
+    gap: 10px;
+}
+
+.work-table-row:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.work-table-cell {
+    flex: 1;
+    text-align: left;
+    padding: 0 10px;
+}
+
+.work-table-empty {
+    text-align: center;
+    padding: 20px;
     font-size: 16px;
-    font-weight: bold;
-    color: #333;
+    color: #cccccc;
 }
 
-.work-item-status {
-    font-size: 14px;
-    font-weight: bold;
-    color: #4caf50;
-    text-transform: capitalize;
+.add-work-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
-.work-item-status.incomplete {
-    color: #f44336;
+.add-work-button {
+    padding: 10px 20px;
 }

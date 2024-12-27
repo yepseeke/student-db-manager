@@ -31,4 +31,9 @@
 .reset-button:hover {
     background-color: transparent;
     color: #ffadd7;
+    transform: none;
+}
+
+.reset-button:active {
+    transform: none;
 }
