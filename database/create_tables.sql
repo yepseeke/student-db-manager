@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS student (
 
 CREATE TABLE qualification_work (
     work_id serial PRIMARY KEY,
-	student_card_id integer NOT NULL REFERENCES student(student_card_id),
+	student_card_id integer NOT NULL REFERENCES student(student_card_id) ON DELETE CASCADE,
 	supervisor_id integer NOT NULL REFERENCES professor(professor_id),
     "name" character varying(400) NOT NULL,
     work_type worktype NOT NULL,
