@@ -17,20 +17,6 @@ services:
     networks:
       - mynetwork
 
-  postgres:
-    container_name: my-postgres-container
-    image: postgres:14.5
-    ports:
-      - "5434:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=students_registry
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - mynetwork
-
   frontend:
     container_name: my-frontend-container
     build:
@@ -45,6 +31,19 @@ services:
     networks:
       - mynetwork
 
+  postgres:
+    container_name: my-postgres-container
+    image: postgres:14.5
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=students_registry
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
 networks:
   mynetwork:
     driver: bridge
