@@ -354,10 +354,11 @@ func ArchiveStudent(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		query := "UPDATE `students` SET `archived` = true WHERE `id` = $1"
-		_, err = db.Exec(query, id)
+		query := fmt.Sprintf("UPDATE student SET archived = true WHERE student_card_id = %s", idStr)
+		_, err = db.Exec(query)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error while trying update student, %v", err)})
+			log.Printf(fmt.Sprintf("Error while trying update student, %v", err))
 			return
 		}
 
@@ -395,11 +396,11 @@ func DeleteStudent(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		query := "DELETE student WHERE student_card_id = $1"
+		query := fmt.Sprintf("DELETE FROM student WHERE student_card_id = %s", idStr)
 
-		_, err = db.Exec(query, id)
+		_, err = db.Exec(query)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while trying delete student"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error while trying delete student, %v", err)})
 			return
 		}
 
