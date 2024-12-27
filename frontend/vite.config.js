@@ -7,22 +7,22 @@ export default defineConfig({
   server: {
     proxy: {
       '/students_page': {
-        target: 'http://localhost:8080',
+        target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
       '/faculties': {
-        target: 'http://localhost:8080',
+        target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
       '/departments': {
-        target: 'http://localhost:8080',
+        target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
       '/student_card': {
-        target: 'http://localhost:8080',
+        target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
