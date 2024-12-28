@@ -26,17 +26,22 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      '/archive_student': {           // Добавлено
+      '/archive_student': {           
         target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
-      '/delete_student': {            // Добавлено
+      '/delete_student': {            
         target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
       },
-      '/add_qualification_work': {    // Добавлено
+      '/add_qualification_work': {    
+        target: 'http://backend:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/update_student': {    
         target: 'http://backend:8080',
         changeOrigin: true,
         secure: false,
