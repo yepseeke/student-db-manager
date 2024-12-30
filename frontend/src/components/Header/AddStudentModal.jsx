@@ -10,6 +10,7 @@ function AddStudentModal({ onClose, onStudentAdded }) {
         phone_number: '',
         email: '',
         birth_date: '',
+        group: '',
     });
 
     const handleInputChange = (e) => {
@@ -71,6 +72,15 @@ function AddStudentModal({ onClose, onStudentAdded }) {
                         name="patronymic"
                         placeholder="Отчество"
                         value={formData.patronymic}
+                        onChange={handleInputChange}
+                        required
+                    />
+                    <input
+                        className="modal-input"
+                        type="text"
+                        name="group"
+                        placeholder="Группа"
+                        value={formData.group}
                         onChange={handleInputChange}
                         required
                     />
