@@ -46,6 +46,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/add_student': {    
+        target: 'http://backend:8080',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import StudentCard from './StudentCard';
 import Pagination from '../Pagination/Pagination.jsx';
 import CustomPageSizeSelect from '../CustomPageSizeSelect/CustomPageSizeSelect.jsx';
 import './StudentList.css';
 
-function StudentList({ filters }) {
+function StudentList({filters, studentsUpdated}) {
     const [students, setStudents] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -48,7 +48,7 @@ function StudentList({ filters }) {
 
     useEffect(() => {
         handleFetchStudents();
-    }, [currentPage]);
+    }, [currentPage, studentsUpdated]);
 
     useEffect(() => {
         const fetchWithReset = async () => {
@@ -93,7 +93,7 @@ function StudentList({ filters }) {
                     />
                     По алфавиту
                 </button>
-                <CustomPageSizeSelect pageSize={pageSize} onChange={handlePageSizeChange} />
+                <CustomPageSizeSelect pageSize={pageSize} onChange={handlePageSizeChange}/>
             </div>
             {loading ? (
                 <p>Загрузка информации о студентах...</p>
@@ -120,6 +120,7 @@ StudentList.propTypes = {
         selectedFaculties: PropTypes.arrayOf(PropTypes.number),
         selectedDepartments: PropTypes.arrayOf(PropTypes.number),
     }).isRequired,
+    studentsUpdated: PropTypes.object.isRequired,
 };
 
 export default StudentList;
