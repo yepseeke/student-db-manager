@@ -192,11 +192,18 @@ func AddStudent(db *sql.DB) gin.HandlerFunc {
 		phoneNumber := c.DefaultQuery("phone_number", "")
 		email := c.DefaultQuery("email", "")
 		birthDate := c.DefaultQuery("birth_date", "")
+		group := c.DefaultQuery("group", "")
 
-		baseQuery := "INSERT INTO student (surname, name, patronymic, email, phone_number, birth_date, year) VALUES ($1, $2, $3, $4, $5, $6, $7)"
-		_, err := db.Exec(baseQuery, surname, name, patronymic, email, phoneNumber, birthDate, 1)
+		baseQuery := "INSERT INTO student (surname, name, patronymic, email, phone_number, birth_date, \"group\", \"year\") VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
+		_, err := db.Exec(baseQuery, surname, name, patronymic, email, phoneNumber, birthDate, group, "1")
 		if err != nil {
-			log.Printf("Error inserting student: %s", err)
+			log.Printf("Database error: %s", err)
+			log.Printf("Query: %s", baseQuery)
+			log.Printf("Params: surname=%s, name=%s, patronymic=%s, email=%s, phone_number=%s, birth_date=%s, group=%s, year=%s",
+				surname, name, patronymic, email, phoneNumber, birthDate, group, "1")
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert student", "details": err.Error()})
+			return
 		}
 
 		c.Status(http.StatusOK)
