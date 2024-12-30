@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Filters from './components/Filters/Filters';
@@ -14,6 +14,7 @@ function App() {
     });
 
     const [isModalOpen, setModalOpen] = useState(false);
+    const [studentsUpdated, setStudentsUpdated] = useState(false); // Флаг для обновления списка
 
     const applyFilters = (newFilters) => {
         setFilters(newFilters);
@@ -21,6 +22,10 @@ function App() {
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
+
+    const handleStudentsUpdate = () => {
+        setStudentsUpdated((prev) => !prev); // Переключение флага для обновления списка
+    };
 
     return (
         <Router>
@@ -34,7 +39,7 @@ function App() {
                             element={
                                 <>
                                     <Filters onApplyFilters={applyFilters} />
-                                    <StudentList filters={filters} />
+                                    <StudentList filters={filters} studentsUpdated={studentsUpdated} />
                                 </>
                             }
                         />
@@ -42,7 +47,12 @@ function App() {
                         <Route path="/student/:id" element={<StudentDetails />} />
                     </Routes>
                 </div>
-                {isModalOpen && <AddStudentModal onClose={closeModal} />}
+                {isModalOpen && (
+                    <AddStudentModal
+                        onClose={closeModal}
+                        onStudentAdded={handleStudentsUpdate}
+                    />
+                )}
             </div>
         </Router>
     );

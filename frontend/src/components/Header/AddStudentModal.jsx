@@ -2,7 +2,7 @@ import './AddStudentModal.css';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-function AddStudentModal({ onClose }) {
+function AddStudentModal({ onClose, onStudentAdded }) {
     const [formData, setFormData] = useState({
         name: '',
         surname: '',
@@ -35,6 +35,7 @@ function AddStudentModal({ onClose }) {
 
             alert('Студент успешно добавлен');
             onClose();
+            onStudentAdded();
         } catch (error) {
             console.error('Ошибка при добавлении студента:', error);
             alert('Не удалось добавить студента');
@@ -110,6 +111,7 @@ function AddStudentModal({ onClose }) {
 
 AddStudentModal.propTypes = {
     onClose: PropTypes.func.isRequired,
+    onStudentAdded: PropTypes.func.isRequired,
 };
 
 export default AddStudentModal;
